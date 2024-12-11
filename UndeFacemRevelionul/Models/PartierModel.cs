@@ -6,6 +6,7 @@
         public int UserId { get; set; }
         public int Points { get; set; }
         public int RankId { get; set; }
-        
+        public ICollection<PlaylistSongModel> PlaylistSongs { get; set; }
+
     }
 }
