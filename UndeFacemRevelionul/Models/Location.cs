@@ -9,6 +9,8 @@
         public float Price { get; set; }
         public int Capacity { get; set; }
         public string Description { get; set; }
+        public float Rating {  get; set; }
+        public DateOnly Date { get; set; }
 
     }
 }

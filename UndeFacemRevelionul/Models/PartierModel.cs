@@ -1,6 +1,6 @@
 ﻿namespace UndeFacemRevelionul.Models
 {
-    public class Partier
+    public class PartierModel
     {
         public int Id { get; set; }
         public int UserId { get; set; }
