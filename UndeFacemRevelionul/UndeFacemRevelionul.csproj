@@ -15,4 +15,9 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ContextModels\" />
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>
