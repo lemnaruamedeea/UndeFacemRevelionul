@@ -15,6 +15,11 @@
         public ICollection<PartyPartierModel> PartyUsers { get; set; }
 
         public PlaylistModel Playlist { get; set; }
+        // Navigation property to tasks related to this party
+        public ICollection<TaskModel> Tasks { get; set; }
+
+        // Navigation property to superstitions related to this party
+        public ICollection<SuperstitionModel> Superstitions { get; set; }
 
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace UndeFacemRevelionul.Models
 {
-    public class Location
+    public class LocationModel
     {
         public int Id { get; set; }
         public int ProviderId { get; set; }

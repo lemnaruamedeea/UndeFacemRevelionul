@@ -1,6 +1,6 @@
 ﻿namespace UndeFacemRevelionul.Models
 {
-    public class FoodMenu
+    public class FoodMenuModel
     {
         public int Id { get; set; }
         public int ProviderId { get; set; }

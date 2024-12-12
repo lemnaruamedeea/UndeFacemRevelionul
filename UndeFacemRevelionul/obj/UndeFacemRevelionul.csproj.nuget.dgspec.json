@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Sol\\Documents\\GitHub\\Unde-Facem-Revelionul\\UndeFacemRevelionul\\UndeFacemRevelionul.csproj": {}
+    "C:\\Users\\andre\\OneDrive\\Documente\\GitHub\\Unde-Facem-Revelionul\\UndeFacemRevelionul\\UndeFacemRevelionul.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Sol\\Documents\\GitHub\\Unde-Facem-Revelionul\\UndeFacemRevelionul\\UndeFacemRevelionul.csproj": {
+    "C:\\Users\\andre\\OneDrive\\Documente\\GitHub\\Unde-Facem-Revelionul\\UndeFacemRevelionul\\UndeFacemRevelionul.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Sol\\Documents\\GitHub\\Unde-Facem-Revelionul\\UndeFacemRevelionul\\UndeFacemRevelionul.csproj",
+        "projectUniqueName": "C:\\Users\\andre\\OneDrive\\Documente\\GitHub\\Unde-Facem-Revelionul\\UndeFacemRevelionul\\UndeFacemRevelionul.csproj",
         "projectName": "UndeFacemRevelionul",
-        "projectPath": "C:\\Users\\Sol\\Documents\\GitHub\\Unde-Facem-Revelionul\\UndeFacemRevelionul\\UndeFacemRevelionul.csproj",
-        "packagesPath": "C:\\Users\\Sol\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Sol\\Documents\\GitHub\\Unde-Facem-Revelionul\\UndeFacemRevelionul\\obj\\",
+        "projectPath": "C:\\Users\\andre\\OneDrive\\Documente\\GitHub\\Unde-Facem-Revelionul\\UndeFacemRevelionul\\UndeFacemRevelionul.csproj",
+        "packagesPath": "C:\\Users\\andre\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\andre\\OneDrive\\Documente\\GitHub\\Unde-Facem-Revelionul\\UndeFacemRevelionul\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Sol\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\andre\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -84,7 +84,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403\\RuntimeIdentifierGraph.json"
         }
       }
     }
