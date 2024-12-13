@@ -3,8 +3,7 @@
     public enum UserRole
     {
         Partier,
-        FoodProvider, 
-        LocationProvider,
+        Provider, 
         Admin
     }
 }

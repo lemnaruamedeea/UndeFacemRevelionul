@@ -10,5 +10,8 @@
 
         // Navigation property
         public UserModel User { get; set; }  // Each provider is linked to one user
+                                             // Navigation properties to related data
+        public ICollection<LocationModel> Locations { get; set; }
+        public ICollection<FoodMenuModel> FoodMenus { get; set; }
     }
 }
