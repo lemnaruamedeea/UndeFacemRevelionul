@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using System;
 using UndeFacemRevelionul.ContextModels;
@@ -10,6 +11,16 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<RevelionContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Revelion")));
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";  // Calea către login dacă utilizatorul nu este autentificat
+        //options.LogoutPath = "/Account/Logout";  // Calea către logout
+        //options.AccessDeniedPath = "/Account/AccessDenied";  // Calea pentru accesul interzis
+        options.ExpireTimeSpan = TimeSpan.FromDays(7);  // Setăm timpul de expirare al cookie-ului
+        options.SlidingExpiration = true;  // Face ca cookie-ul să se reînnoiască când utilizatorul interacționează cu aplicația
+    });
 
 var app = builder.Build();
 

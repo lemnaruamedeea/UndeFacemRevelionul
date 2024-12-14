@@ -8,7 +8,7 @@ namespace UndeFacemRevelionul.Models
         public string Email { get; set; }
         public string Password { get; set; }
         public string UserRole { get; set; }  // Role as a string (Partier, Provider, etc.)
-        public string ProfilePicturePath { get; set; }
+        public string? ProfilePicturePath { get; set; }
 
         // Navigation properties
         public ICollection<ProviderModel> Providers { get; set; }

@@ -1,0 +1,37 @@
+﻿@model UndeFacemRevelionul.ViewModels.RegisterViewModel
+
+<h2>Register</h2>
+<form asp-action="Register" method="post">
+    <div>
+        <label for="Name">Name:</label>
+        <input asp-for="Name" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div>
+        <label for="Email">Email:</label>
+        <input asp-for="Email" type="email" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div>
+        <label for="Password">Password:</label>
+        <input asp-for="Password" type="password" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div>
+        <label for="ConfirmPassword">Confirm Password:</label>
+        <input asp-for="ConfirmPassword" type="password" />
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+    </div>
+    <div>
+        <label for="UserRole">Role:</label>
+        <select asp-for="UserRole" asp-items="Html.GetEnumSelectList<UndeFacemRevelionul.Logic.UserRole>()">
+            <option value="">Select a role</option>
+        </select>
+        <span asp-validation-for="UserRole" class="text-danger"></span>
+    </div>
+    <button type="submit">Register</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UndeFacemRevelionul.ContextModels;
 
@@ -11,9 +12,10 @@ using UndeFacemRevelionul.ContextModels;
 namespace UndeFacemRevelionul.Migrations
 {
     [DbContext(typeof(RevelionContext))]
-    partial class RevelionContextModelSnapshot : ModelSnapshot
+    [Migration("20241213133012_initial1")]
+    partial class initial1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

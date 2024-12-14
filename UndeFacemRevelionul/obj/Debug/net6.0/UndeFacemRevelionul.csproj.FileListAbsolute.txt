@@ -75,3 +75,4 @@ C:\Users\Sol\Documents\GitHub\Unde-Facem-Revelionul\UndeFacemRevelionul\obj\Debu
 C:\Users\Sol\Documents\GitHub\Unde-Facem-Revelionul\UndeFacemRevelionul\obj\Debug\net6.0\UndeFacemRevelionul.pdb
 C:\Users\Sol\Documents\GitHub\Unde-Facem-Revelionul\UndeFacemRevelionul\obj\Debug\net6.0\UndeFacemRevelionul.genruntimeconfig.cache
 C:\Users\Sol\Documents\GitHub\Unde-Facem-Revelionul\UndeFacemRevelionul\obj\Debug\net6.0\ref\UndeFacemRevelionul.dll
+C:\Users\Sol\Documents\GitHub\Unde-Facem-Revelionul\UndeFacemRevelionul\bin\Debug\net6.0\BCrypt.Net-Next.dll
