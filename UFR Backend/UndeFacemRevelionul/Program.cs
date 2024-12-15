@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Security.Claims;
 using UndeFacemRevelionul.ContextModels;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +21,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         //options.AccessDeniedPath = "/Account/AccessDenied";  // Calea pentru accesul interzis
         options.ExpireTimeSpan = TimeSpan.FromDays(7);  // Setăm timpul de expirare al cookie-ului
         options.SlidingExpiration = true;  // Face ca cookie-ul să se reînnoiască când utilizatorul interacționează cu aplicația
+        options.Events.OnSigningIn = async context =>
+        {
+            var identity = (ClaimsIdentity)context.Principal.Identity;
+            var userId = context.Principal.FindFirstValue(ClaimTypes.NameIdentifier); // ID-ul utilizatorului
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId)); // Adaugă Claim-ul ID
+        };
     });
 builder.Services.AddHttpContextAccessor(); // Adăugăm IHttpContextAccessor
 

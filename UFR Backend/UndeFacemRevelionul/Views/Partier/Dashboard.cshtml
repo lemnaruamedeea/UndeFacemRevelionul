@@ -3,8 +3,31 @@
     var userName = User.Identity.Name;  // Numele utilizatorului logat
 }
 
-<h2>Welcome, @userName!</h2>
+<h1>Welcome, @userName!</h1>
 
 <p>Welcome to your Dashboard, where you can manage your events, view your profile, and more.</p>
 
 
+<h3>Your parties</h3>
+@if (Model.Parties != null)
+{
+    <ul>
+        @foreach (var party in Model.Parties)
+        {
+            <li>
+                <strong>@party.Name</strong> - @party.Date.ToString("dd MMM yyyy")
+                <br />
+                <small>Budget: @party.TotalBudget</small>
+                <br />
+                <small>Points: @party.TotalPoints</small>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>You have no parties yet.</p>
+}
+
+<h3>Create a new party</h3>
+<a href="@Url.Action("CreateParty", "Partier")" class="btn btn-primary">Creează petrecerea ta</a>

@@ -17,9 +17,9 @@ public class PartyModel
     public DateTime Date { get; set; }
     public int TotalPoints { get; set; }
 
-    public ICollection<PartyPartierModel> PartyUsers { get; set; }
-    public PlaylistModel Playlist { get; set; }
-    public ICollection<TaskModel> Tasks { get; set; }
-    public ICollection<SuperstitionModel> Superstitions { get; set; }
+    public ICollection<PartyPartierModel>? PartyUsers { get; set; }
+    public PlaylistModel? Playlist { get; set; }
+    public ICollection<TaskModel>? Tasks { get; set; }
+    public ICollection<SuperstitionModel>? Superstitions { get; set; }
 
 }

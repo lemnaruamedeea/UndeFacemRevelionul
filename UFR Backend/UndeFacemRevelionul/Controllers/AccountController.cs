@@ -153,7 +153,8 @@ public class AccountController : Controller
                 new Claim(ClaimTypes.Name, user.Name),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.UserRole.ToString()), // User's role
-                new Claim("UserId", user.Id.ToString()) // User's ID
+                new Claim("UserId", user.Id.ToString()), // User's ID
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
