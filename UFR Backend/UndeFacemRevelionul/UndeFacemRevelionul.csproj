@@ -18,6 +18,8 @@
 
   <ItemGroup>
     <Folder Include="Services\" />
+    <Folder Include="Views\Admin\" />
+    <Folder Include="Views\Provider\" />
   </ItemGroup>
 
 </Project>

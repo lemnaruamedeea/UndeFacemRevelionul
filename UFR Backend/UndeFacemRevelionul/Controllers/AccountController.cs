@@ -22,10 +22,12 @@ public class AccountController : Controller
         _logger = logger;
     }
 
-    [HttpGet]
+   [HttpGet]
     public IActionResult Register()
     {
-        return View();
+        // Asigură-te că modelul este transmis corect
+        var model = new RegisterViewModel();
+        return View(model);
     }
 
 
@@ -34,36 +36,82 @@ public class AccountController : Controller
     {
         if (ModelState.IsValid)
         {
+            // Validăm că rolul nu este 'Admin'
+            if (model.UserRole.ToString() == "Admin")
+            {
+                ModelState.AddModelError(string.Empty, "Nu aveți permisiunea să alegeți rolul Admin.");
+                return View(model);
+            }
+
+            // Dacă utilizatorul a încărcat o poză de profil, o salvăm
+            string profilePicturePath = null;
+            //if (model.ProfilePicture != null)
+            //{
+            //    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", model.ProfilePicture.FileName);
+            //    using (var stream = new FileStream(filePath, FileMode.Create))
+            //    {
+            //        model.ProfilePicture.CopyTo(stream);
+            //    }
+            //    profilePicturePath = "/uploads/" + model.ProfilePicture.FileName;
+            //}
+
+            
             var newUser = new UserModel
             {
                 Name = model.Name,
                 Email = model.Email,
-                Password = HashPassword(model.Password),
-                UserRole = model.UserRole.ToString()
+                Password = BCrypt.Net.BCrypt.HashPassword(model.Password),
+                UserRole = model.UserRole.ToString(),
+                ProfilePicturePath = profilePicturePath
             };
 
+            // Salvăm utilizatorul în baza de date
             _context.Users.Add(newUser);
             _context.SaveChanges();
 
-            TempData["Message"] = "User registered successfully!";
-            return RedirectToAction("SuccessRegister");  
-        }
-
-        // Debugging 
-        foreach (var key in ModelState.Keys)
-        {
-            var state = ModelState[key];
-            if (state.Errors.Count > 0)
+            if (newUser.UserRole == "Partier")
             {
-                
-                foreach (var error in state.Errors)
+                var partier = new PartierModel
                 {
-                    Console.WriteLine($"Key: {key}, Error: {error.ErrorMessage}");
-                }
+                    UserId = newUser.Id,
+                    Points = 0,  // Puncte inițiale, poți să le modifici cum dorești
+                    RankId = 1  // Poți adăuga un RankId de bază (de exemplu, 1 pentru "nou")
+                };
+
+                // Adaugă-l în tabelul PartierModel
+                _context.Partiers.Add(partier);
+                _context.SaveChanges();
+            }
+
+            if (newUser.UserRole == "Provider")
+            {
+                var provider = new ProviderModel
+                {
+                    UserId = newUser.Id,
+                    Rating = 0,  // Puncte inițiale, poți să le modifici cum dorești
+                    Details = "Add details",  // Poți adăuga un RankId de bază (de exemplu, 1 pentru "nou")
+                    Contact = "Add contact info",
+
+                };
+
+                // Adaugă-l în tabelul PartierModel
+                _context.Providers.Add(provider);
+                _context.SaveChanges();
+            }
+
+            TempData["Message"] = "User registered successfully!";
+            return RedirectToAction("Login");
+        }
+        if (!ModelState.IsValid)
+        {
+            foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+            {
+                _logger.LogError(error.ErrorMessage);
             }
         }
 
-        return View(model);  
+        // Dacă modelul nu este valid, afișăm din nou formularul cu erori
+        return View(model);
     }
 
 
@@ -80,6 +128,16 @@ public class AccountController : Controller
         return View(); 
     }
 
+    [HttpGet]
+    public IActionResult Login()
+    {
+        // Creează un model gol pentru prima afișare a paginii
+        var model = new LoginViewModel();
+        return View(model);
+    }
+
+
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model)
@@ -92,7 +150,8 @@ public class AccountController : Controller
             {
                 var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Email),
+                new Claim(ClaimTypes.Name, user.Name),
+                new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.UserRole.ToString()), // User's role
                 new Claim("UserId", user.Id.ToString()) // User's ID
             };
@@ -105,15 +164,39 @@ public class AccountController : Controller
 
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
 
-                return RedirectToAction("Index", "Home");
+                if (user.UserRole == "Partier")
+                {
+                    return RedirectToAction("Dashboard", "Partier");
+                }
+                else if (user.UserRole == "Provider")
+                {
+                    return RedirectToAction("Dashboard", "Provider");
+                }
+                else if (user.UserRole == "Admin")
+                {
+                    return RedirectToAction("Dashboard", "Admin");
+                }
             }
             else
             {
-                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                ModelState.AddModelError("", "Invalid login attempt.");
             }
+        
         }
 
         return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken] // Protecție CSRF
+    public async Task<IActionResult> Logout()
+    {
+        
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+        TempData["Message"] = "You have successfully logged out.";
+
+        return RedirectToAction("Login", "Account");
     }
 
 

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "3dyCBOnP0HFf11nbUDeSZXS75R+b8C90xrcF44YBP+4QRuNqmGbJZrxUyoEwMqBGG1DGZZc3Vaa4CsbXelU0Sw==",
+  "dgSpecHash": "GfRZMAnmjGNYyVbT+v96nMB6MjzKC+jyewJsyaJwX7dC3jQ8lUG/MzugrbTbwORnG+AlPwYEAaEVXyew/bvdGA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Sol\\Documents\\GitHub\\Unde-Facem-Revelionul\\UndeFacemRevelionul\\UndeFacemRevelionul.csproj",
+  "projectFilePath": "C:\\Users\\Sol\\Documents\\GitHub\\Unde-Facem-Revelionul\\UFR Backend\\UndeFacemRevelionul\\UndeFacemRevelionul.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Sol\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\Sol\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
