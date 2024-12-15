@@ -2093,11 +2093,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Sol\\Documents\\GitHub\\Unde-Facem-Revelionul\\UndeFacemRevelionul\\UndeFacemRevelionul.csproj",
+      "projectUniqueName": "C:\\Users\\Sol\\Documents\\GitHub\\Unde-Facem-Revelionul\\UFR Backend\\UndeFacemRevelionul\\UndeFacemRevelionul.csproj",
       "projectName": "UndeFacemRevelionul",
-      "projectPath": "C:\\Users\\Sol\\Documents\\GitHub\\Unde-Facem-Revelionul\\UndeFacemRevelionul\\UndeFacemRevelionul.csproj",
+      "projectPath": "C:\\Users\\Sol\\Documents\\GitHub\\Unde-Facem-Revelionul\\UFR Backend\\UndeFacemRevelionul\\UndeFacemRevelionul.csproj",
       "packagesPath": "C:\\Users\\Sol\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Sol\\Documents\\GitHub\\Unde-Facem-Revelionul\\UndeFacemRevelionul\\obj\\",
+      "outputPath": "C:\\Users\\Sol\\Documents\\GitHub\\Unde-Facem-Revelionul\\UFR Backend\\UndeFacemRevelionul\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

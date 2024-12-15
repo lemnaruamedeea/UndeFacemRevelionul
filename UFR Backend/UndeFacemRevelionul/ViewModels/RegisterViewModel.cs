@@ -24,6 +24,7 @@ namespace UndeFacemRevelionul.ViewModels
 
         [Required]
         public UserRole UserRole { get; set; }
+        public IFormFile? ProfilePicture { get; set; }  // Opțional pentru poza de profil
 
     }
 }

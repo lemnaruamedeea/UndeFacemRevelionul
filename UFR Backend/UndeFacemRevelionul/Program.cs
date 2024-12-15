@@ -16,11 +16,13 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(options =>
     {
         options.LoginPath = "/Account/Login";  // Calea către login dacă utilizatorul nu este autentificat
-        //options.LogoutPath = "/Account/Logout";  // Calea către logout
+        options.LogoutPath = "/Account/Logout";  // Calea către logout
         //options.AccessDeniedPath = "/Account/AccessDenied";  // Calea pentru accesul interzis
         options.ExpireTimeSpan = TimeSpan.FromDays(7);  // Setăm timpul de expirare al cookie-ului
         options.SlidingExpiration = true;  // Face ca cookie-ul să se reînnoiască când utilizatorul interacționează cu aplicația
     });
+builder.Services.AddHttpContextAccessor(); // Adăugăm IHttpContextAccessor
+
 
 var app = builder.Build();
 
@@ -37,6 +39,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();  
 app.UseAuthorization();
 
 app.MapControllerRoute(
