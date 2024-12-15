@@ -1,0 +1,14 @@
+﻿@model UndeFacemRevelionul.Models.PartyModel
+
+<h1>Detalii Petrecere: @Model.Name</h1>
+<p>Data petrecerii: @Model.Date.ToString("d")</p>
+<p>Buget total: @Model.TotalBudget</p>
+<p>Buget rămas: @Model.RemainingBudget</p>
+
+<h3>Participanți:</h3>
+<ul>
+    @foreach (var name in ViewBag.PartierNames as List<string>)
+    {
+        <li>@name</li>
+    }
+</ul>
