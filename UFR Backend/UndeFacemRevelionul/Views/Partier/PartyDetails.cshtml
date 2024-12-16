@@ -1,14 +1,39 @@
 ﻿@model UndeFacemRevelionul.Models.PartyModel
 
-<h1>Detalii Petrecere: @Model.Name</h1>
-<p>Data petrecerii: @Model.Date.ToString("d")</p>
-<p>Buget total: @Model.TotalBudget</p>
-<p>Buget rămas: @Model.RemainingBudget</p>
+<h1>Party: @Model.Name</h1>
+<p>Party date: @Model.Date.ToString("d")</p>
+<p>Total budget: @Model.TotalBudget</p>
+<p>Remaining budget: @Model.RemainingBudget</p>
+<p>Location: @Model.Location</p>
+<p>Menu: @Model.FoodMenu</p>
 
-<h3>Participanți:</h3>
-<ul>
-    @foreach (var name in ViewBag.PartierNames as List<string>)
-    {
-        <li>@name</li>
-    }
-</ul>
+<h3>Members</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Points</th>
+            <th>Add/Remove member</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var member in Model.PartyUsers)
+        {
+            <tr>
+                <td>@member.Partier.User.Name</td>
+                <td>@member.Partier.Points</td>
+                <td>
+                    <form asp-action="RemoveMember" method="post" style="display:inline">
+                        <input type="hidden" name="partyId" value="@Model.Id" />
+                        <input type="hidden" name="partierId" value="@member.PartierId" />
+                        <button type="submit" class="btn btn-danger">Șterge</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<a asp-action="AddMember" asp-route-partyId="@Model.Id" class="btn btn-success">Add member</a>
+<a href="@Url.Action("EditParty", "Partier", new { id = Model.Id })" class="btn btn-primary">Edit Party</a>
+<a href="@Url.Action("DeleteParty", "Partier", new { id = Model.Id })" class="btn btn-danger">Delete Party</a>
+

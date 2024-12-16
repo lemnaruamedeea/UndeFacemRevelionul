@@ -183,6 +183,170 @@ public class PartierController : Controller
     }
 
 
+    // GET: EditParty
+    [HttpGet]
+    public IActionResult EditParty(int id)
+    {
+        var party = _context.Parties.FirstOrDefault(p => p.Id == id);
+
+        if (party == null)
+        {
+            return NotFound();
+        }
+
+        return View(party);
+    }
+
+    // POST: EditParty
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult EditParty(PartyModel updatedParty)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(updatedParty);
+        }
+
+        var party = _context.Parties.FirstOrDefault(p => p.Id == updatedParty.Id);
+
+        if (party == null)
+        {
+            return NotFound();
+        }
+
+        party.Name = updatedParty.Name;
+        party.TotalBudget = updatedParty.TotalBudget;
+        party.RemainingBudget = updatedParty.RemainingBudget;
+        party.Date = updatedParty.Date;
+        party.LocationId = updatedParty.LocationId;
+        party.FoodMenuId = updatedParty.FoodMenuId;
+
+        _context.SaveChanges();
+
+        return RedirectToAction("PartyDetails", new { id = party.Id });
+    }
+
+    // GET: DeleteParty (Confirmare)
+    [HttpGet]
+    public IActionResult DeleteParty(int id)
+    {
+        var party = _context.Parties.FirstOrDefault(p => p.Id == id);
+
+        if (party == null)
+        {
+            return NotFound();
+        }
+
+        return View(party);
+    }
+
+    // POST: DeleteParty
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult DeletePartyConfirmed(int id)
+    {
+        // Găsește petrecerea
+        var party = _context.Parties.FirstOrDefault(p => p.Id == id);
+        if (party == null)
+        {
+            return NotFound();
+        }
+
+        // Șterge înregistrările asociate din PartyPartiers
+        var partyPartiers = _context.PartyPartiers.Where(pp => pp.PartyId == id).ToList();
+        _context.PartyPartiers.RemoveRange(partyPartiers);
+
+        // Șterge petrecerea
+        _context.Parties.Remove(party);
+
+        // Salvează modificările
+        _context.SaveChanges();
+
+        return RedirectToAction("Dashboard");
+    }
+    [HttpGet]
+    public IActionResult AddMember(int partyId)
+    {
+        var party = _context.Parties.FirstOrDefault(p => p.Id == partyId);
+        if (party == null)
+        {
+            return NotFound("Petrecerea nu a fost găsită.");
+        }
+
+        ViewBag.PartyId = partyId;
+        ViewBag.PartyName = party.Name;
+        return View();
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult AddMember(int partyId, string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            TempData["ErrorMessage"] = "Adresa de email nu poate fi goală.";
+            return RedirectToAction("AddMember", new { partyId });
+        }
+
+        var user = _context.Users.FirstOrDefault(u => u.Email == email);
+        if (user == null)
+        {
+            TempData["ErrorMessage"] = "Nu există niciun utilizator cu această adresă de email.";
+            return RedirectToAction("AddMember", new { partyId });
+        }
+
+        var partier = _context.Partiers.FirstOrDefault(p => p.UserId == user.Id);
+        if (partier == null)
+        {
+            TempData["ErrorMessage"] = "Utilizatorul găsit nu este un partier.";
+            return RedirectToAction("AddMember", new { partyId });
+        }
+
+        var alreadyMember = _context.PartyPartiers.Any(pp => pp.PartyId == partyId && pp.PartierId == partier.Id);
+        if (alreadyMember)
+        {
+            TempData["ErrorMessage"] = "Partierul este deja membru al acestei petreceri.";
+            return RedirectToAction("AddMember", new { partyId });
+        }
+
+        var partyPartier = new PartyPartierModel
+        {
+            PartyId = partyId,
+            PartierId = partier.Id
+        };
+
+        _context.PartyPartiers.Add(partyPartier);
+        _context.SaveChanges();
+
+        TempData["SuccessMessage"] = "Partierul a fost adăugat cu succes.";
+        return RedirectToAction("PartyDetails", new { id = partyId });
+    }
+
+
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult RemoveMember(int partyId, int partierId)
+    {
+        var partyPartier = _context.PartyPartiers
+            .FirstOrDefault(pp => pp.PartyId == partyId && pp.PartierId == partierId);
+
+        if (partyPartier == null)
+        {
+            return NotFound();
+        }
+
+        _context.PartyPartiers.Remove(partyPartier);
+        _context.SaveChanges();
+
+        return RedirectToAction("PartyDetails", new { id = partyId });
+    }
+
+
+
+
+
+
 
 
 
