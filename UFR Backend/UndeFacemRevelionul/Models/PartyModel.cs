@@ -20,7 +20,7 @@ public class PartyModel
 
     public ICollection<PartyPartierModel>? PartyUsers { get; set; }
     public PlaylistModel? Playlist { get; set; }
-    public ICollection<TaskModel>? Tasks { get; set; }
+    public ICollection<TaskModel> Tasks { get; set; }
     public ICollection<SuperstitionModel>? Superstitions { get; set; }
 
 }

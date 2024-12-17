@@ -1,9 +1,12 @@
-﻿namespace UndeFacemRevelionul.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace UndeFacemRevelionul.Models
 {
     public class LocationModel
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public int ProviderId { get; set; }
+        public int? ProviderId { get; set; }
         // Navigation property
         public ProviderModel Provider { get; set; }
         public string Name { get; set; }

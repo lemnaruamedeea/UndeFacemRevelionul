@@ -81,6 +81,7 @@ public class RevelionContext : DbContext
             .HasOne(t => t.Party) // Task related to a Party
             .WithMany() // No navigation property on Party
             .HasForeignKey(t => t.PartyId)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.NoAction);
 
         // SuperstitionModel to PartierModel relationship (many-to-one)
@@ -114,6 +115,7 @@ public class RevelionContext : DbContext
         .HasOne(l => l.Provider)
         .WithMany(p => p.Locations) // Relație de 1:N
         .HasForeignKey(l => l.ProviderId)
+        .IsRequired(false)
         .OnDelete(DeleteBehavior.Cascade); // Comportament la ștergere
 
 

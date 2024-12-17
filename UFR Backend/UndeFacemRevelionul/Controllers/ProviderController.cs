@@ -68,13 +68,26 @@ namespace UndeFacemRevelionul.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddLocation(LocationModel location)
+        public IActionResult AddLocation(AddLocationViewModel location)
         {
+
             if (ModelState.IsValid)
             {
-                var providerId = GetCurrentUserId();
-                location.ProviderId = providerId;
-                _context.Locations.Add(location);
+                //var providerId = GetCurrentUserId();
+                var providerId = _context.Providers.Where(p => p.UserId == GetCurrentUserId()).Select(nume => nume.Id).FirstOrDefault();
+                //location.ProviderId = providerId;
+                _context.Locations.Add(new LocationModel
+                {
+                    Name = location.Name,
+                    Address = location.Address,
+                    Description = location.Description,
+                    ProviderId = providerId,
+                    Price = location.Price,
+                    Capacity = location.Capacity,
+                    Rating = location.Rating,
+                    Date = DateTime.Now,
+                  
+                });
                 _context.SaveChanges();
                 return RedirectToAction("Dashboard");
             }
