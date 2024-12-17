@@ -17,5 +17,6 @@ namespace UndeFacemRevelionul.Models
         // Navigation properties
         public ICollection<ProviderModel> Providers { get; set; }
         public ICollection<PartierModel> Partiers { get; set; }
+        public DateTime? BlockedUntil { get; set; } // Data deblocării
     }
 }

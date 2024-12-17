@@ -151,30 +151,39 @@ public class AccountController : Controller
             {
                 if ((user.UserRole == "Partier" || user.UserRole == "Provider") && BCrypt.Net.BCrypt.Verify(model.Password, user.Password))
                 {
-                    var claims = new List<Claim>
+                    if (user.BlockedUntil != null && user.BlockedUntil > DateTime.Now)
                     {
-                        new Claim(ClaimTypes.Name, user.Name),
-                        new Claim(ClaimTypes.Email, user.Email),
-                        new Claim(ClaimTypes.Role, user.UserRole.ToString()), // User's role
-                        new Claim("UserId", user.Id.ToString()), // User's ID
-                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
-                    };
-
-                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                    var authProperties = new AuthenticationProperties
-                    {
-                        IsPersistent = model.RememberMe
-                    };
-
-                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
-
-                    if (user.UserRole == "Partier")
-                    {
-                        return RedirectToAction("Dashboard", "Partier");
+                        var remainingHours = (user.BlockedUntil.Value - DateTime.Now).TotalHours;
+                        return Content($"Contul tău a fost blocat pentru încă: {Math.Ceiling(remainingHours)} ore.");
                     }
-                    else if (user.UserRole == "Provider")
+                    else
                     {
-                        return RedirectToAction("Dashboard", "Provider");
+                        var claims = new List<Claim>
+                        {
+                            new Claim(ClaimTypes.Name, user.Name),
+                            new Claim(ClaimTypes.Email, user.Email),
+                            new Claim(ClaimTypes.Role, user.UserRole.ToString()), // User's role
+                            new Claim("UserId", user.Id.ToString()), // User's ID
+                            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                        };
+
+                        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        var authProperties = new AuthenticationProperties
+                        {
+                            IsPersistent = model.RememberMe
+                        };
+
+                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+
+                        if (user.UserRole == "Partier")
+                        {
+                            return RedirectToAction("Dashboard", "Partier");
+                        }
+                        else if (user.UserRole == "Provider")
+                        {
+                            return RedirectToAction("Dashboard", "Provider");
+                        }
+
                     }
                 }
 
@@ -200,10 +209,12 @@ public class AccountController : Controller
                     return RedirectToAction("Dashboard", "Admin");
                 }
             }
+
             else
             {
                 ModelState.AddModelError("", "Invalid login attempt.");
             }
+
 
         }
 

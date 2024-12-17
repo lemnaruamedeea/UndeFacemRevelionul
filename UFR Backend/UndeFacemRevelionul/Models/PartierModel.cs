@@ -15,5 +15,6 @@
 
         // Navigation property for superstitions assigned to this partier
         public ICollection<SuperstitionModel> Superstitions { get; set; }
+        
     }
 }
