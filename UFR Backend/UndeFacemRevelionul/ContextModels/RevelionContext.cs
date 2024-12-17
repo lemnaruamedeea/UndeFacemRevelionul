@@ -19,6 +19,8 @@ public class RevelionContext : DbContext
     public DbSet<SongModel> Songs { get; set; }
     public DbSet<SuperstitionModel> Superstitions { get; set; }     
     public DbSet<TaskModel> Tasks { get; set; }
+    public DbSet<PartyPartierModel> PartyPartiers { get; set; }
+
 
     public DbSet<PlaylistSongModel> PlaylistSongs { get; set; }
 

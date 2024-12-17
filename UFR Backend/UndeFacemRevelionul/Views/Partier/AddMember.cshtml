@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Adaugă Membru";
+}
+
+<h1>Add member to @ViewBag.PartyName</h1>
+
+<!-- Afișează mesaje de succes/eroare -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<form asp-action="AddMember" method="post">
+    <input type="hidden" name="partyId" value="@ViewBag.PartyId" />
+    <div class="form-group">
+        <label for="email">Email-ul membrului</label>
+        <input type="email" name="email" class="form-control" required placeholder="Input member email address" />
+    </div>
+    <button type="submit" class="btn btn-primary">Add member</button>
+</form>
+
+<a asp-action="PartyDetails" asp-route-id="@ViewBag.PartyId" class="btn btn-secondary mt-3">Back</a>

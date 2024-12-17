@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UndeFacemRevelionul.ContextModels;
 
@@ -11,9 +12,10 @@ using UndeFacemRevelionul.ContextModels;
 namespace UndeFacemRevelionul.Migrations
 {
     [DbContext(typeof(RevelionContext))]
-    partial class RevelionContextModelSnapshot : ModelSnapshot
+    [Migration("20241215174844_partypartiers")]
+    partial class partypartiers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -613,7 +615,8 @@ namespace UndeFacemRevelionul.Migrations
                 {
                     b.Navigation("PartyUsers");
 
-                    b.Navigation("Playlist");
+                    b.Navigation("Playlist")
+                        .IsRequired();
 
                     b.Navigation("Superstitions");
 
