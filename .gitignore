@@ -1,3 +1,9 @@
 .vs/
-/bin/
-/obj/
+bin/
+obj/
+*.dll
+*.pdb
+*.exe
+*.cache
+*.editorconfig
+*.sourcelink.json
