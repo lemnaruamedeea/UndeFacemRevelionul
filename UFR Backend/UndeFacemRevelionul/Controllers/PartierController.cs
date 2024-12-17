@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 using UndeFacemRevelionul.ContextModels;
 using UndeFacemRevelionul.Models;
 using UndeFacemRevelionul.ViewModels;
@@ -412,67 +413,32 @@ public class PartierController : Controller
     }
 
 
-    // Funcție pentru a marca un task ca finalizat
     [HttpPost]
-    [ValidateAntiForgeryToken]
-    public IActionResult CompleteTask(int taskId, int partyId)
+    public IActionResult ClaimTask(int taskId, int partyId)
     {
-        var currentUserId = GetCurrentUserId();
-        var currentPartier = _context.Partiers.FirstOrDefault(p => p.UserId == currentUserId);
+        var task = _context.Tasks.FirstOrDefault(t => t.Id == taskId && t.PartyId == partyId);
 
-        if (currentPartier == null)
+        if (task != null)
         {
-            TempData["ErrorMessage"] = "Nu ai permisiunea necesară.";
-            return RedirectToAction("PartyDetails", new { id = partyId });
+            // Preluăm utilizatorul logat
+            var currentUserId = GetCurrentUserId(); // ID-ul userului logat
+            var currentPartier = _context.Partiers
+                                         .FirstOrDefault(p => p.UserId == currentUserId);
+
+            if (currentPartier != null)
+            {
+                // Asociem task-ul userului logat
+                task.PartierId = currentPartier.Id;
+                _context.SaveChanges();
+            }
         }
 
-        var task = _context.Tasks.FirstOrDefault(t => t.Id == taskId && t.PartierId == currentPartier.Id);
-
-        if (task == null || task.IsCompleted)
-        {
-            TempData["ErrorMessage"] = "Task-ul nu există sau este deja completat.";
-            return RedirectToAction("PartyDetails", new { id = partyId });
-        }
-
-        // Marchează task-ul ca completat și actualizează punctele
-        task.IsCompleted = true;
-        currentPartier.Points += task.Points;
-
-        _context.SaveChanges();
-
-        TempData["SuccessMessage"] = "Task-ul a fost marcat ca finalizat!";
         return RedirectToAction("PartyDetails", new { id = partyId });
     }
 
-    // Funcție pentru a lua un task neasignat
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public IActionResult AssignTask(int taskId, int partyId)
-    {
-        var currentUserId = GetCurrentUserId();
-        var currentPartier = _context.Partiers.FirstOrDefault(p => p.UserId == currentUserId);
 
-        if (currentPartier == null)
-        {
-            TempData["ErrorMessage"] = "Nu ești asociat cu această petrecere!";
-            return RedirectToAction("PartyDetails", new { id = partyId });
-        }
 
-        var task = _context.Tasks.FirstOrDefault(t => t.Id == taskId && t.PartierId == null);
-
-        if (task == null)
-        {
-            TempData["ErrorMessage"] = "Task-ul este deja asignat.";
-            return RedirectToAction("PartyDetails", new { id = partyId });
-        }
-
-        // Asignează task-ul utilizatorului logat
-        task.PartierId = currentPartier.Id;
-        _context.SaveChanges();
-
-        TempData["SuccessMessage"] = "Ai preluat task-ul!";
-        return RedirectToAction("PartyDetails", new { id = partyId });
-    }
+    
 
     [HttpGet]
     public IActionResult AddTask(int partyId)
@@ -511,6 +477,38 @@ public class PartierController : Controller
         ViewBag.PartyId = partyId;
         return RedirectToAction("PartyTasks", new { id = partyId });
 
+    }
+    [HttpPost]
+    public IActionResult ToggleTaskCompletion(int taskId, int partyId)
+    {
+        var task = _context.Tasks.FirstOrDefault(t => t.Id == taskId && t.PartyId == partyId);
+
+        if (task != null && task.PartierId.HasValue)
+        {
+            // Preluăm Partier-ul asociat task-ului
+            var partier = _context.Partiers.FirstOrDefault(p => p.Id == task.PartierId);
+
+            if (partier != null)
+            {
+                // Verificăm și schimbăm starea task-ului
+                if (!task.IsCompleted)
+                {
+                    // Dacă task-ul nu este completat, îl completăm și adăugăm punctele
+                    task.IsCompleted = true;
+                    partier.Points += task.Points; // Adaugăm punctele la Partier
+                }
+                else
+                {
+                    // Dacă era deja completat, îl setăm ca necompletat și scădem punctele
+                    task.IsCompleted = false;
+                    partier.Points -= task.Points; // Scădem punctele din Partier
+                }
+
+                _context.SaveChanges();
+            }
+        }
+
+        return RedirectToAction("PartyDetails", new { id = partyId });
     }
 
 
