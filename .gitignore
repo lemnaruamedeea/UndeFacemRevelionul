@@ -1,1 +1,13 @@
 .vs/
+# Directoare și fișiere build
+bin/
+obj/
+*.dll
+*.pdb
+*.exe
+*.cache
+*.editorconfig
+*.sourcelink.json
+
+# Alte fișiere temporare
+*.log
