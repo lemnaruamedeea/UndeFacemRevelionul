@@ -1,0 +1,20 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+    var userName = User.Identity.Name;  // Numele utilizatorului logat
+}
+
+<h2>Welcome, @userName!</h2>
+
+<p>Welcome to your Dashboard, where you can manage your events, view your profile, and more!!!!!!!!!!!!!!!</p>
+
+<div class="admin-buttons">
+    <h1>Bun venit, Admin!</h1>
+    <p>Alege o categorie pentru gestionare:</p>
+    <button onclick="location.href='@Url.Action("PartiersList", "Admin")'" class="btn btn-primary">Petrecăreți</button>
+    <button onclick="location.href='@Url.Action("ProvidersList", "Admin")'" class="btn btn-primary">Furnizori</button>
+    <button onclick="location.href='@Url.Action("PartiesList", "Admin")'" class="btn btn-primary">Petreceri</button>
+    <button onclick="location.href='@Url.Action("LocationsList", "Admin")'" class="btn btn-primary">Locații</button>
+    <button onclick="location.href='@Url.Action("MenusList", "Admin")'" class="btn btn-primary">Meniuri</button>
+</div>
+
+

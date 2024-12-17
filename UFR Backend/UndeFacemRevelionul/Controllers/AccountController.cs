@@ -22,7 +22,7 @@ public class AccountController : Controller
         _logger = logger;
     }
 
-   [HttpGet]
+    [HttpGet]
     public IActionResult Register()
     {
         // Asigură-te că modelul este transmis corect
@@ -55,7 +55,7 @@ public class AccountController : Controller
             //    profilePicturePath = "/uploads/" + model.ProfilePicture.FileName;
             //}
 
-            
+
             var newUser = new UserModel
             {
                 Name = model.Name,
@@ -117,15 +117,15 @@ public class AccountController : Controller
 
     private string HashPassword(string password)
     {
-        return BCrypt.Net.BCrypt.HashPassword(password);  
+        return BCrypt.Net.BCrypt.HashPassword(password);
     }
 
     [HttpGet]
     public IActionResult SuccessRegister()
     {
-        
+
         ViewBag.Message = TempData["Message"];
-        return View(); 
+        return View();
     }
 
     [HttpGet]
@@ -146,42 +146,72 @@ public class AccountController : Controller
         {
             var user = _context.Users.FirstOrDefault(u => u.Email == model.Email);
 
-            if (user != null && BCrypt.Net.BCrypt.Verify(model.Password, user.Password))
+            if (user != null)
             {
-                var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.UserRole.ToString()), // User's role
-                new Claim("UserId", user.Id.ToString()) // User's ID
-            };
-
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var authProperties = new AuthenticationProperties
+                if ((user.UserRole == "Partier" || user.UserRole == "Provider") && BCrypt.Net.BCrypt.Verify(model.Password, user.Password))
                 {
-                    IsPersistent = model.RememberMe
-                };
+                    if (user.BlockedUntil != null && user.BlockedUntil > DateTime.Now)
+                    {
+                        var remainingHours = (user.BlockedUntil.Value - DateTime.Now).TotalHours;
+                        return Content($"Contul tău a fost blocat pentru încă: {Math.Ceiling(remainingHours)} ore.");
+                    }
+                    else
+                    {
+                        var claims = new List<Claim>
+                        {
+                            new Claim(ClaimTypes.Name, user.Name),
+                            new Claim(ClaimTypes.Email, user.Email),
+                            new Claim(ClaimTypes.Role, user.UserRole.ToString()), // User's role
+                            new Claim("UserId", user.Id.ToString()), // User's ID
+                            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                        };
 
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+                        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        var authProperties = new AuthenticationProperties
+                        {
+                            IsPersistent = model.RememberMe
+                        };
 
-                if (user.UserRole == "Partier")
-                {
-                    return RedirectToAction("Dashboard", "Partier");
+                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+
+                        if (user.UserRole == "Partier")
+                        {
+                            return RedirectToAction("Dashboard", "Partier");
+                        }
+                        else if (user.UserRole == "Provider")
+                        {
+                            return RedirectToAction("Dashboard", "Provider");
+                        }
+                    }
                 }
-                else if (user.UserRole == "Provider")
+
+                else if (user.UserRole == "Admin" && model.Password == user.Password)
                 {
-                    return RedirectToAction("Dashboard", "Provider");
-                }
-                else if (user.UserRole == "Admin")
-                {
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, user.Name),
+                        new Claim(ClaimTypes.Email, user.Email),
+                        new Claim(ClaimTypes.Role, user.UserRole.ToString()), // User's role
+                        new Claim("UserId", user.Id.ToString()), // User's ID
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    };
+
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var authProperties = new AuthenticationProperties
+                    {
+                        IsPersistent = model.RememberMe
+                    };
+
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+
                     return RedirectToAction("Dashboard", "Admin");
                 }
             }
-            else
-            {
-                ModelState.AddModelError("", "Invalid login attempt.");
-            }
-        
+                else
+                {
+                    ModelState.AddModelError("", "Invalid login attempt.");
+                }
+
         }
 
         return View(model);
@@ -191,7 +221,7 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken] // Protecție CSRF
     public async Task<IActionResult> Logout()
     {
-        
+
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
         TempData["Message"] = "You have successfully logged out.";

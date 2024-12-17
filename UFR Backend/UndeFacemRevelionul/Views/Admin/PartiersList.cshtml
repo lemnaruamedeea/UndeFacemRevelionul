@@ -1,0 +1,54 @@
+﻿<h2>Lista Petrecăreți</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nume</th>
+            <th>Email</th>
+            <th>Acțiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var partier in Model)
+        {
+            <tr>
+                <td>@partier.Name</td>
+                <td>@partier.Email</td>
+                <td>
+                    @if (partier.BlockedUntil != null && partier.BlockedUntil > DateTime.Now)
+                    {
+                        <button onclick="unblockPartier(@partier.Id)" class="btn btn-success">Deblochează</button>
+                    }
+                    else
+                    {
+                        <button onclick="blockPartier(@partier.Id)" class="btn btn-danger">Blochează</button>
+                    }
+                </td>
+                <td>
+                    <form action="@Url.Action("DeleteUser", "Admin")" method="post" onsubmit="return confirm('Ești sigur că vrei să ștergi acest utilizator?');">
+                        <input type="hidden" name="id" value="@partier.Id" />
+                        <button type="submit" class="btn btn-danger">Șterge</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    function blockPartier(id) {
+        let hours = prompt("Pentru câte ore vrei să blochezi acest utilizator?");
+        if (hours && !isNaN(hours) && hours > 0) {
+            // Redirecționează către metoda de blocare
+            window.location.href = `/Admin/BlockPartier?id=${id}&hours=${hours}`;
+        } else {
+            alert("Introduceți un număr valid de ore.");
+        }
+    }
+
+    function unblockPartier(id) {
+        if (confirm("Ești sigur că vrei să deblochezi acest utilizator?")) {
+            // Redirecționează către metoda de deblocare
+            window.location.href = `/Admin/UnblockPartier?id=${id}`;
+        }
+    }
+</script>
