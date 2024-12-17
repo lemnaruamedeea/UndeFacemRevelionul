@@ -1,0 +1,22 @@
+﻿@model UndeFacemRevelionul.ViewModels.EditMenuViewModel
+
+<h2>Edit Menu</h2>
+
+<form asp-action="EditMenu" method="post">
+    <div>
+        <label for="Name">Menu Name</label>
+        <input type="text" id="Name" name="Name" value="@Model.Name" />
+    </div>
+
+    <div>
+        <label for="Description">Description</label>
+        <input type="text" id="Description" name="Description" value="@Model.Description" />
+    </div>
+
+    <div>
+        <label for="Price">Price</label>
+        <input type="text" id="Price" name="Price" value="@Model.Price" />
+    </div>
+
+    <button type="submit">Save</button>
+</form>

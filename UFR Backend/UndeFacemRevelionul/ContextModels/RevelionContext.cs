@@ -110,11 +110,12 @@ public class RevelionContext : DbContext
                 .OnDelete(DeleteBehavior.NoAction);
 
 
-        // One-to-Many: Provider and Locations
-        modelBuilder.Entity<ProviderModel>()
-            .HasMany(p => p.Locations)
-            .WithOne(l => l.Provider)
-            .HasForeignKey(l => l.ProviderId);
+        modelBuilder.Entity<LocationModel>()
+        .HasOne(l => l.Provider)
+        .WithMany(p => p.Locations) // Relație de 1:N
+        .HasForeignKey(l => l.ProviderId)
+        .OnDelete(DeleteBehavior.Cascade); // Comportament la ștergere
+
 
         // One-to-Many: Provider and FoodMenus
         modelBuilder.Entity<ProviderModel>()

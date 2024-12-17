@@ -1,4 +1,5 @@
 .vs/
+# Directoare și fișiere build
 bin/
 obj/
 *.dll
@@ -7,3 +8,6 @@ obj/
 *.cache
 *.editorconfig
 *.sourcelink.json
+
+# Alte fișiere temporare
+*.log

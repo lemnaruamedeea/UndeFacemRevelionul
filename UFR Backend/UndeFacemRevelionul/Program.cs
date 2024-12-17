@@ -11,7 +11,10 @@ builder.Services.AddControllersWithViews();
 
 
 builder.Services.AddDbContext<RevelionContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Revelion")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Revelion"))
+           .EnableSensitiveDataLogging()  // Adaugă acest rând pentru a loga parametrii interogărilor
+           .LogTo(Console.WriteLine));    // Loghează în consolă
+
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -46,8 +49,15 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication();  
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+});
 
 app.MapControllerRoute(
     name: "default",
