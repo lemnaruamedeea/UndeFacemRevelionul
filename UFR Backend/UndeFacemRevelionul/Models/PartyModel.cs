@@ -4,6 +4,7 @@ namespace UndeFacemRevelionul.Models;
 
 public class PartyModel
 {
+    
     public int Id { get; set; }
     public string Name { get; set; }
 
