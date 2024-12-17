@@ -1,0 +1,44 @@
+﻿@{
+    ViewData["Title"] = "Provider Dashboard";
+    var userName = User.Identity.Name;  // Numele utilizatorului logat
+}
+
+<h1>Welcome, @userName!</h1>
+
+<p>Welcome to your Dashboard, where you can manage your locations and menus.</p>
+
+<h3>Your Locations</h3>
+@if (ViewBag.Locations != null && ((List<UndeFacemRevelionul.Models.LocationModel>)ViewBag.Locations).Count > 0)
+{
+    <ul>
+        @foreach (var location in (List<UndeFacemRevelionul.Models.LocationModel>)ViewBag.Locations)
+        {
+            <li>@location.Name - @location.Address</li>
+        }
+    </ul>
+}
+else
+{
+    <p>You don't have any locations yet.</p>
+}
+
+<!-- Butonul pentru a crea o locație nouă -->
+<a href="@Url.Action("CreateLocation", "Provider", new { providerId = ViewBag.ProviderId })" class="btn btn-primary">Create Location</a>
+
+<h3>Your Menus</h3>
+@if (ViewBag.Menus != null && ((List<UndeFacemRevelionul.Models.FoodMenuModel>)ViewBag.Menus).Count > 0)
+{
+    <ul>
+        @foreach (var menu in (List<UndeFacemRevelionul.Models.FoodMenuModel>)ViewBag.Menus)
+        {
+            <li>@menu.Name</li>
+        }
+    </ul>
+}
+else
+{
+    <p>You don't have any menus yet.</p>
+}
+
+<!-- Butonul pentru a crea un meniu nou -->
+<a href="@Url.Action("CreateMenu", "Provider", new { providerId = ViewBag.ProviderId })" class="btn btn-primary">Create Menu</a>

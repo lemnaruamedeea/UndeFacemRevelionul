@@ -6,6 +6,7 @@
 <p>Remaining budget: @Model.RemainingBudget</p>
 <p>Location: @Model.Location</p>
 <p>Menu: @Model.FoodMenu</p>
+<p>Party Points: @Model.TotalPoints</p>
 
 <h3>Members</h3>
 <table class="table">
@@ -13,7 +14,7 @@
         <tr>
             <th>Name</th>
             <th>Points</th>
-            <th>Add/Remove member</th>
+            <th>Remove member</th>
         </tr>
     </thead>
     <tbody>
@@ -26,7 +27,7 @@
                     <form asp-action="RemoveMember" method="post" style="display:inline">
                         <input type="hidden" name="partyId" value="@Model.Id" />
                         <input type="hidden" name="partierId" value="@member.PartierId" />
-                        <button type="submit" class="btn btn-danger">Șterge</button>
+                        <button type="submit" class="btn btn-danger">Remove</button>
                     </form>
                 </td>
             </tr>

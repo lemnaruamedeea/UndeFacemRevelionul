@@ -21,24 +21,33 @@ public class PartierController : Controller
     [HttpGet]
     public IActionResult Dashboard()
     {
-        
         var currentUserId = GetCurrentUserId();
 
-        // 2. Căutăm în baza de date `Partier`-ul care are `UserId` egal cu `currentUserId`
+        // Găsim partier-ul asociat utilizatorului logat
         var partier = _context.Partiers.FirstOrDefault(p => p.UserId == currentUserId);
 
-        // Obține toate petrecerile asociate partierului
+        if (partier == null)
+        {
+            TempData["ErrorMessage"] = "Nu există un partier asociat utilizatorului logat.";
+            return RedirectToAction("Index", "Home");
+        }
+
+        // Găsim toate petrecerile asociate utilizatorului
         var parties = _context.PartyPartiers
-            .Where(p => p.PartierId == partier.Id)
-            .Select(p => p.Party)
+            .Where(pp => pp.PartierId == partier.Id)
+            .Select(pp => pp.Party)
             .ToList();
 
-        var model = new PartierDashboardViewModel
-        {
-            Parties = parties
-        };
+        // Găsim rangul utilizatorului logat pe baza punctelor
+        var rank = _context.Ranks
+            .FirstOrDefault(r => partier.Points >= r.MinPoints && partier.Points <= r.MaxPoints);
 
-        return View(model);
+        // Transmitem datele către View prin ViewBag
+        ViewBag.Parties = parties;
+        ViewBag.RankName = rank?.Name ?? "N/A";
+        ViewBag.PartierPoints = partier.Points;
+
+        return View();
     }
 
 
@@ -95,11 +104,16 @@ public class PartierController : Controller
             // Adăugăm utilizatorul curent în lista PartyUsers
             party.PartyUsers.Add(partyUser);
 
+            
+
+
             // Salvează relația între petrecere și utilizatorul creator
             _context.PartyPartiers.Add(partyUser);
 
             // Salvează totul într-o singură operațiune
             _context.SaveChanges(); // Salvează petrecerea și relația
+
+            UpdatePartyTotalPoints(party.Id);
 
             // Redirecționare după succes
             return RedirectToAction("Dashboard", "Partier");
@@ -113,6 +127,8 @@ public class PartierController : Controller
                 _logger.LogError($"Error in field: {error.ErrorMessage}");
             }
         }
+        
+
 
         // Reîncarcă formularul dacă există erori
         return View(model);
@@ -177,6 +193,8 @@ public class PartierController : Controller
 
         // Adăugăm lista de nume a partierilor în petrecere
         ViewBag.PartierNames = partierNames;
+        UpdatePartyTotalPoints(id);
+
 
         return View("PartyDetails", party); // Asigură-te că se indică corect numele view-ului
 
@@ -318,7 +336,10 @@ public class PartierController : Controller
         _context.PartyPartiers.Add(partyPartier);
         _context.SaveChanges();
 
-        TempData["SuccessMessage"] = "Partierul a fost adăugat cu succes.";
+        UpdatePartyTotalPoints(partyId);
+
+        TempData["SuccessMessage"] = "Partierul a fost adăugat cu succes și totalul punctelor a fost actualizat.";
+
         return RedirectToAction("PartyDetails", new { id = partyId });
     }
 
@@ -339,10 +360,48 @@ public class PartierController : Controller
         _context.PartyPartiers.Remove(partyPartier);
         _context.SaveChanges();
 
+        UpdatePartyTotalPoints(partyId);
+        TempData["SuccessMessage"] = "Membrul a fost șters și totalul punctelor a fost actualizat.";
+
+
         return RedirectToAction("PartyDetails", new { id = partyId });
     }
 
 
+
+    private void UpdatePartyTotalPoints(int partyId)
+    {
+        
+        var party = _context.Parties
+            .Include(p => p.PartyUsers) // relația PartyPartiers
+            .ThenInclude(pp => pp.Partier) 
+            .FirstOrDefault(p => p.Id == partyId);
+
+        if (party == null)
+        {
+            throw new Exception("Petrecerea nu a fost găsită.");
+        }
+        int totalPoints = party.PartyUsers.Sum(pu => pu.Partier.Points);
+        party.TotalPoints = totalPoints;
+        _context.SaveChanges();
+    }
+
+
+
+    [HttpGet]
+    public IActionResult EditAccount()
+    {
+        var currentUserId = GetCurrentUserId();
+        var user = _context.Users.FirstOrDefault(u => u.Id == currentUserId);
+
+        if (user == null)
+        {
+            return NotFound("User not found.");
+        }
+
+        return View(user);
+    }
+    
 
 
 

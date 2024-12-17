@@ -18,6 +18,10 @@ build_property.GenerateRazorMetadataSourceChecksumAttributes =
 build_property.MSBuildProjectDirectory = C:\Users\Sol\Documents\GitHub\Unde-Facem-Revelionul\UFR Backend\UndeFacemRevelionul
 build_property._RazorSourceGeneratorDebug = 
 
+[C:/Users/Sol/Documents/GitHub/Unde-Facem-Revelionul/UFR Backend/UndeFacemRevelionul/Views/Account/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Sol/Documents/GitHub/Unde-Facem-Revelionul/UFR Backend/UndeFacemRevelionul/Views/Account/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -60,6 +64,14 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/Sol/Documents/GitHub/Unde-Facem-Revelionul/UFR Backend/UndeFacemRevelionul/Views/Partier/PartyDetails.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFydGllclxQYXJ0eURldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Sol/Documents/GitHub/Unde-Facem-Revelionul/UFR Backend/UndeFacemRevelionul/Views/Provider/CreateLocation.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvdmlkZXJcQ3JlYXRlTG9jYXRpb24uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Sol/Documents/GitHub/Unde-Facem-Revelionul/UFR Backend/UndeFacemRevelionul/Views/Provider/Dashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvdmlkZXJcRGFzaGJvYXJkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Sol/Documents/GitHub/Unde-Facem-Revelionul/UFR Backend/UndeFacemRevelionul/Views/Shared/Error.cshtml]

@@ -8,23 +8,23 @@ namespace UndeFacemRevelionul.ViewModels
     public class CreatePartyViewModel
     {
         [Required]
-        [StringLength(100, ErrorMessage = "Numele petrecerii poate avea maxim 100 de caractere.")]
+        [StringLength(100, ErrorMessage = "Max. 100 characters for party name.")]
         public string Name { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
-        [Display(Name = "Data petrecerii")]
+        [Display(Name = "Party date")]
         public DateTime Date { get; set; }
 
         [Required]
-        [Range(0, double.MaxValue, ErrorMessage = "Bugetul trebuie să fie un număr pozitiv.")]
-        [Display(Name = "Buget total")]
+        [Range(0, double.MaxValue, ErrorMessage = "Budget value has to be over 0.")]
+        [Display(Name = "Total budget")]
         public float TotalBudget { get; set; }
 
-        [Display(Name = "Locație")]
+        [Display(Name = "Location")]
         public int? LocationId { get; set; } // Locația este opțională
 
-        [Display(Name = "Meniu")]
+        [Display(Name = "Menu")]
         public int? FoodMenuId { get; set; } // Meniul este opțional
 
         
