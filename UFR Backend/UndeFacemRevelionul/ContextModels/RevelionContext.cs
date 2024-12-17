@@ -19,6 +19,8 @@ public class RevelionContext : DbContext
     public DbSet<SongModel> Songs { get; set; }
     public DbSet<SuperstitionModel> Superstitions { get; set; }     
     public DbSet<TaskModel> Tasks { get; set; }
+    public DbSet<PartyPartierModel> PartyPartiers { get; set; }
+
 
     public DbSet<PlaylistSongModel> PlaylistSongs { get; set; }
 
@@ -108,11 +110,12 @@ public class RevelionContext : DbContext
                 .OnDelete(DeleteBehavior.NoAction);
 
 
-        // One-to-Many: Provider and Locations
-        modelBuilder.Entity<ProviderModel>()
-            .HasMany(p => p.Locations)
-            .WithOne(l => l.Provider)
-            .HasForeignKey(l => l.ProviderId);
+        modelBuilder.Entity<LocationModel>()
+        .HasOne(l => l.Provider)
+        .WithMany(p => p.Locations) // Relație de 1:N
+        .HasForeignKey(l => l.ProviderId)
+        .OnDelete(DeleteBehavior.Cascade); // Comportament la ștergere
+
 
         // One-to-Many: Provider and FoodMenus
         modelBuilder.Entity<ProviderModel>()

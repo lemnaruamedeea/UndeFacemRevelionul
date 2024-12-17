@@ -1,12 +1,13 @@
 .vs/
-# Exclude bin și obj
+# Directoare și fișiere build
 bin/
 obj/
-
-# Exclude fișiere generate
 *.dll
 *.pdb
 *.exe
 *.cache
-*.json
 *.editorconfig
+*.sourcelink.json
+
+# Alte fișiere temporare
+*.log

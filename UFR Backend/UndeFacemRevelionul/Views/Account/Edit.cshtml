@@ -1,0 +1,69 @@
+﻿@model UndeFacemRevelionul.ViewModels.UserEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Account";
+}
+
+<h2>Edit Account</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<form method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+
+    <div class="form-group">
+        <label for="Name">Name</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Email">Email</label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="ProfilePicture">Profile Picture</label>
+        <input type="file" asp-for="ProfilePicture" class="form-control" />
+    </div>
+
+    <!-- Password Change Section -->
+    <div class="form-group">
+        <label for="CurrentPassword">Current Password</label>
+        <input type="password" asp-for="CurrentPassword" class="form-control" />
+        <span asp-validation-for="CurrentPassword" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="NewPassword">New Password</label>
+        <input type="password" asp-for="NewPassword" class="form-control" />
+        <span asp-validation-for="NewPassword" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="ConfirmNewPassword">Confirm New Password</label>
+        <input type="password" asp-for="ConfirmNewPassword" class="form-control" />
+        <span asp-validation-for="ConfirmNewPassword" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+</form>
+
+<br />
+
+<form asp-action="Delete" method="post" onsubmit="return confirm('Are you sure you want to delete your account?');">
+    <button type="submit" class="btn btn-danger">Delete Account</button>
+</form>
+
+<br />
+@{
+    string controllerName = User.IsInRole("Partier") ? "Partier" : User.IsInRole("Provider") ? "Provider" : "Admin";
+}
+
+<a asp-action="Dashboard" asp-controller="@controllerName" class="btn btn-secondary">Back to Dashboard</a>

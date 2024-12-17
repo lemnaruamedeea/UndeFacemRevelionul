@@ -1,0 +1,20 @@
+﻿@model UndeFacemRevelionul.ViewModels.CreatePartyViewModel
+<h1>Creează o Petrecere</h1>
+
+<form method="post" asp-action="CreateParty">
+    <div class="form-group">
+        <label for="Name">Nume</label>
+        <input type="text" class="form-control" id="Name" name="Name" value="@Model.Name" required />
+    </div>
+    <div class="form-group">
+        <label for="Date">Data</label>
+        <input type="date" class="form-control" id="Date" name="Date" value="@Model.Date.ToString("yyyy-MM-dd")" required />
+    </div>
+    <div class="form-group">
+        <label for="TotalBudget">Buget Total</label>
+        <input type="number" class="form-control" id="TotalBudget" name="TotalBudget" value="@Model.TotalBudget" required />
+    </div>
+    
+    </div>
+    <button type="submit" class="btn btn-success mt-3">Creează</button>
+</form>

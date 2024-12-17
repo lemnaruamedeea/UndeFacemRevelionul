@@ -1,4 +1,5 @@
-﻿using UndeFacemRevelionul.Logic;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using UndeFacemRevelionul.Logic;
 namespace UndeFacemRevelionul.Models
 {
     public class UserModel
@@ -9,6 +10,9 @@ namespace UndeFacemRevelionul.Models
         public string Password { get; set; }
         public string UserRole { get; set; }  // Role as a string (Partier, Provider, etc.)
         public string? ProfilePicturePath { get; set; }
+
+        [NotMapped]
+        public IFormFile? ProfilePicture { get; set; }
 
         // Navigation properties
         public ICollection<ProviderModel> Providers { get; set; }
