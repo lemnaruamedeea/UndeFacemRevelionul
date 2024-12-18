@@ -173,6 +173,7 @@ public class PartierController : Controller
         // Căutăm petrecerea după ID
         var party = _context.Parties
             .Include(p => p.FoodMenu) // Încarcă meniul asociat
+            .Include(p => p.Location) // Încarcă meniul asociat
             .Include(p => p.PartyUsers)  // Include utilizatorii petrecerii
             .ThenInclude(pu => pu.Partier)  // Include informațiile despre partieri
             .ThenInclude(pa => pa.User)   // Încarcă detaliile utilizatorului
@@ -330,6 +331,42 @@ public class PartierController : Controller
 
         // Asociem meniul la petrecere
         party.FoodMenuId = menu.Id;
+        _context.SaveChanges();
+
+        return RedirectToAction("Dashboard", new { id = partyId });
+    }
+
+    [HttpGet]
+    public IActionResult ListLocations(int partyId)
+    {
+        // Obține meniurile împreună cu informațiile despre furnizor
+        var locations = _context.Locations
+            .Include(l => l.Provider) // Include detalii despre Provider
+            .ToList();
+
+        var viewModel = new ListLocationsViewModel
+        {
+            PartyId = partyId,
+            Locations = locations
+        };
+
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult AddLocationToParty(int partyId, int locationId)
+    {
+        var party = _context.Parties.FirstOrDefault(p => p.Id == partyId);
+        if (party == null)
+            return NotFound();
+
+        var location = _context.Locations.Find(locationId);
+        if (location == null)
+            return NotFound();
+
+        // Asociem meniul la petrecere
+        party.LocationId = location.Id;
         _context.SaveChanges();
 
         return RedirectToAction("Dashboard", new { id = partyId });

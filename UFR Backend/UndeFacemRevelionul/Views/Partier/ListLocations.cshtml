@@ -1,0 +1,106 @@
+﻿@using UndeFacemRevelionul.ViewModels
+
+<h2>Selectează o Locatie</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nume</th>
+			<th>Adresă</th>
+            <th>Descriere</th>
+            <th>Preț</th>
+            <th>Rating</th>
+            <th>Furnizor</th>
+            <th>Capacitate</th>
+            <th>Data</th>
+            <th>Acțiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var location in Model.Locations)
+        {
+            <tr>
+                <td>@location.Name</td>
+                <td>@location.Address</td>
+                <td>@location.Description</td>
+                <td>@location.Price</td>
+                <td>@location.Rating</td>
+                <td>@location.Provider?.User?.Name ?? "Fără furnizor"</td>
+                <td>@location.Capacity</td>
+                <td>@location.Date</td>
+                <td>
+                    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#locationModal"
+                            data-id="@location.Id"
+                            data-name="@location.Name"
+                            data-address="@location.Address"
+                            data-price="@location.Price"
+                            data-description="@location.Description"
+                            data-rating="@location.Rating"
+                            data-provider="@location.Provider?.User?.Name ?? " Fără furnizor""
+                            data-capacity="@location.Capacity"
+                            data-date="@location.Date">
+						Detalii
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Modal pentru afișarea detaliilor meniului -->
+<div class="modal fade" id="locationModal" tabindex="-1" aria-labelledby="locationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="locationModalLabel">Detalii Locatie</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h4 id="locationName"></h4>
+                <p><strong>Adresa:</strong> <span id="locationAddress"></span></p>
+                <p><strong>Descriere:</strong> <span id="locationDescription"></span></p>
+                <p><strong>Preț:</strong> <span id="locationPrice"></span></p>
+                <p><strong>Rating:</strong> <span id="locationRating"></span></p>
+                <p><strong>Furnizor:</strong> <span id="locationProvider"></span></p>
+                <p><strong>Capacitate:</strong> <span id="locationCapacity"></span></p>
+                <p><strong>Data:</strong> <span id="locationDate"></span></p>
+            </div>
+            <div class="modal-footer">
+                <form asp-action="AddLocationToParty" method="post">
+                    <input type="hidden" name="partyId" value="@Model.PartyId" />
+                    <input type="hidden" name="locationId" id="locationId" />
+                    <button type="submit" class="btn btn-success">Adaugă la Petrecere</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Script pentru a popula modalul cu detalii despre meniu
+        var locationModal = document.getElementById('locationModal');
+        locationModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var name = button.getAttribute('data-name');
+            var address = button.getAttribute('data-address');
+            var price = button.getAttribute('data-price');
+            var description = button.getAttribute('data-description');
+            var rating = button.getAttribute('data-rating');
+            var provider = button.getAttribute('data-provider');
+            var capacity = button.getAttribute('data-capacity');
+            var date = button.getAttribute('data-date');
+
+            document.getElementById('locationName').innerText = name;
+            document.getElementById('locationAddress').innerText = address;
+            document.getElementById('locationDescription').innerText = description;
+            document.getElementById('locationPrice').innerText = price;
+            document.getElementById('locationRating').innerText = rating;
+            document.getElementById('locationProvider').innerText = provider;
+            document.getElementById('locationCapacity').innerText = capacity;
+            document.getElementById('locationDate').innerText = date;
+            document.getElementById('locationId').value = id;
+        });
+    </script>
+}
