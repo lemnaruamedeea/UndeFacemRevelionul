@@ -5,7 +5,7 @@
 <p>Total budget: @Model.TotalBudget</p>
 <p>Remaining budget: @Model.RemainingBudget</p>
 <p>Location: @Model.Location</p>
-<p>Menu: @Model.FoodMenu</p>
+<p>Menu: @Model.FoodMenu.Name</p>
 <p>Party Points: @Model.TotalPoints</p>
 
 <h3>Members</h3>
@@ -35,6 +35,7 @@
     </tbody>
 </table>
 <a asp-action="AddMember" asp-route-partyId="@Model.Id" class="btn btn-success">Add member</a>
+<a asp-action="ListMenus" asp-route-partyId="@Model.Id" class="btn btn-success">Adaugă Meniu</a>
 <a href="@Url.Action("EditParty", "Partier", new { id = Model.Id })" class="btn btn-primary">Edit Party</a>
 <a href="@Url.Action("DeleteParty", "Partier", new { id = Model.Id })" class="btn btn-danger">Delete Party</a>
 
