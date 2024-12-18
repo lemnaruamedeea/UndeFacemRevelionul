@@ -102,9 +102,23 @@ namespace UndeFacemRevelionul.Controllers
 
             if (user != null)
             {
-                // Șterge utilizatorul din baza de date
-                var partier = _context.Partiers.Where(p => p.UserId == id).ToList();
-                _context.Partiers.RemoveRange(partier);
+                if(user.UserRole == "Provider")
+                {
+                    // Șterge providerul din baza de date
+                    var provider = _context.Providers.FirstOrDefault(p => p.UserId == id);
+                    var locations = _context.Locations.Where(s => s.ProviderId == provider.Id).ToList();
+                    var menus = _context.FoodMenus.Where(s => s.ProviderId == provider.Id).ToList();
+                    _context.Providers.Remove(provider);
+                    _context.Locations.RemoveRange(locations);
+                    _context.FoodMenus.RemoveRange(menus);
+                }
+                else if (user.UserRole == "Partier")
+                {
+                    // Șterge petrecărețul din baza de date
+                    var partier = _context.Partiers.FirstOrDefault(p => p.UserId == id);
+                    _context.Partiers.Remove(partier);
+                }
+                
                 _context.Users.Remove(user);
                 _context.SaveChanges();
                 TempData["SuccessMessage"] = "Utilizatorul a fost șters cu succes!";
