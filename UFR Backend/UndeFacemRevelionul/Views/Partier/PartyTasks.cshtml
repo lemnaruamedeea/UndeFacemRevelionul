@@ -1,0 +1,24 @@
+﻿<h1>Tasks for Party</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Nume Task</th>
+            <th>Asignat</th>
+            <th>Status</th>
+            <th>Acțiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var task in Model)
+        {
+            <tr>
+                <td>@task.Name</td>
+                <td>@(task.IsCompleted ? "Completat" : "Necompletat")</td>
+                <td>@task.Points</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<a href="@Url.Action("AddTask", "Partier", new { partyId = Model[0].PartyId })" class="btn btn-primary mb-3">Add New Task</a>
+

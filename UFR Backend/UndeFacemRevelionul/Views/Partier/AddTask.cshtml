@@ -1,0 +1,22 @@
+﻿@model UndeFacemRevelionul.ViewModels.AddTaskViewModel
+
+<h2>Add Task</h2>
+
+<form asp-action="AddTask" method="post">
+    <input type="hidden" asp-for="PartyId" />
+
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" required />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Points"></label>
+        <input asp-for="Points" class="form-control" type="number" min="0" required />
+        <span asp-validation-for="Points" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">Add Task</button>
+    <a asp-action="PartyDetails" asp-route-id="@Model.PartyId" class="btn btn-secondary">Cancel</a>
+</form>

@@ -39,4 +39,60 @@
 <a asp-action="ListLocations" asp-route-partyId="@Model.Id" class="btn btn-success">Add Location</a>
 <a href="@Url.Action("EditParty", "Partier", new { id = Model.Id })" class="btn btn-primary">Edit Party</a>
 <a href="@Url.Action("DeleteParty", "Partier", new { id = Model.Id })" class="btn btn-danger">Delete Party</a>
+</br>
+<!-- My Tasks Section -->
+<h2>Tasks</h2>
+
+@if (ViewBag.AllTasks != null && (ViewBag.AllTasks as IEnumerable<UndeFacemRevelionul.Models.TaskModel>)?.Any() == true)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nume Task</th>
+                <th>Status</th>
+                <th>Puncte</th>
+                <th>Acțiuni</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var task in ViewBag.AllTasks)
+            {
+                <tr>
+                    <td>@task.Name</td>
+                    <td>
+                        <form asp-action="ToggleTaskCompletion" method="post" style="display:inline">
+                            <input type="hidden" name="taskId" value="@task.Id" />
+                            <input type="hidden" name="partyId" value="@Model.Id" />
+                            <input type="checkbox" onchange="this.form.submit()" @(task.IsCompleted ? "checked" : "") />
+                        </form>
+                    </td>
+                    <td>@task.Points</td>
+                    <td>
+                        @if (task.PartierId == null)
+                        {
+                            <form asp-action="ClaimTask" method="post" style="display:inline">
+                                <input type="hidden" name="taskId" value="@task.Id" />
+                                <input type="hidden" name="partyId" value="@Model.Id" />
+                                <button type="submit" class="btn btn-success">Claim Task</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span>Claimed by: @(task.Partier?.User?.Name ?? "Unknown")</span>
+                        }
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Nu sunt taskuri disponibile pentru această petrecere.</p>
+}
+
+
+<!-- Buton pentru a naviga la PartyTasks -->
+<a asp-action="AddTask" asp-route-partyId="@Model.Id" class="btn btn-primary">Add Task</a>
 

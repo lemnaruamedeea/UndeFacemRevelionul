@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UndeFacemRevelionul.ContextModels;
 
@@ -11,9 +12,10 @@ using UndeFacemRevelionul.ContextModels;
 namespace UndeFacemRevelionul.Migrations
 {
     [DbContext(typeof(RevelionContext))]
-    partial class RevelionContextModelSnapshot : ModelSnapshot
+    [Migration("20241217173235_location_provider_null")]
+    partial class location_provider_null
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -362,7 +364,7 @@ namespace UndeFacemRevelionul.Migrations
                     b.Property<int?>("PartierModelId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PartyId")
+                    b.Property<int>("PartyId")
                         .HasColumnType("int");
 
                     b.Property<int?>("PartyModelId")
@@ -577,7 +579,8 @@ namespace UndeFacemRevelionul.Migrations
                     b.HasOne("UndeFacemRevelionul.Models.PartyModel", "Party")
                         .WithMany()
                         .HasForeignKey("PartyId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("UndeFacemRevelionul.Models.PartyModel", null)
                         .WithMany("Tasks")

@@ -17,5 +17,9 @@ namespace UndeFacemRevelionul.ViewModels
         public string Description { get; set; }
 
         public int ProviderId { get; set; } // ID-ul furnizorului care adaugă locația
+        public float Price { get; set; }
+        public int Capacity { get; set; }
+        public float Rating { get; set; }
+        //public DateTime Date { get; set; }
     }
 }

@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 using UndeFacemRevelionul.ContextModels;
 using UndeFacemRevelionul.Models;
 using UndeFacemRevelionul.ViewModels;
@@ -105,7 +107,7 @@ public class PartierController : Controller
             // Adăugăm utilizatorul curent în lista PartyUsers
             party.PartyUsers.Add(partyUser);
 
-            
+
 
 
             // Salvează relația între petrecere și utilizatorul creator
@@ -128,7 +130,7 @@ public class PartierController : Controller
                 _logger.LogError($"Error in field: {error.ErrorMessage}");
             }
         }
-        
+
 
 
         // Reîncarcă formularul dacă există erori
@@ -167,11 +169,10 @@ public class PartierController : Controller
 
     public IActionResult PartyDetails(int id)
     {
-        // Obține ID-ul utilizatorului logat
         var currentUserId = GetCurrentUserId();
 
-        // Căutăm petrecerea după ID
         var party = _context.Parties
+            .Include(p => p.Tasks)
             .Include(p => p.FoodMenu) // Încarcă meniul asociat
             .Include(p => p.Location) // Încarcă meniul asociat
             .Include(p => p.PartyUsers)  // Include utilizatorii petrecerii
@@ -181,27 +182,37 @@ public class PartierController : Controller
 
         if (party == null)
         {
-            return NotFound(); // Dacă petrecerea nu există
+            return NotFound();
         }
 
-        // Aici extragem lista de partieri care participă la această petrecere
+        var currentPartier = _context.Partiers.FirstOrDefault(p => p.UserId == currentUserId);
+
+        if (currentPartier == null)
+        {
+            TempData["ErrorMessage"] = "Partierul nu a fost găsit.";
+            return RedirectToAction("Dashboard", "Partier");
+        }
+
+        var assignedTasks = party.Tasks.Where(t => t.PartierId == currentPartier.Id).ToList();
+
+        var tasks = party.Tasks.ToList();
+        ViewBag.AssignedTasks = assignedTasks;
+        ViewBag.CurrentPartier = currentPartier;
+        ViewBag.AllTasks = _context.Tasks.Where(x => x.PartyId == id).ToList();
+
         var partyPartiers = _context.PartyPartiers
-            .Where(pp => pp.PartyId == id)  // Căutăm partierii care sunt asociați acestei petreceri
-            .Include(pp => pp.Partier)  // Include datele partierilor
-            .ThenInclude(p => p.User)   // Include datele utilizatorilor din Partier
-            .Select(pp => pp.Partier)   // Extrage doar Partier-ul
+            .Where(pp => pp.PartyId == id)
+            .Include(pp => pp.Partier)
+            .ThenInclude(p => p.User)
+            .Select(pp => pp.Partier)
             .ToList();
 
-        // Creăm lista de nume pentru participanți
         var partierNames = partyPartiers.Select(partier => partier.User.Name).ToList();
-
-        // Adăugăm lista de nume a partierilor în petrecere
         ViewBag.PartierNames = partierNames;
+
         UpdatePartyTotalPoints(id);
 
-
-        return View("PartyDetails", party); // Asigură-te că se indică corect numele view-ului
-
+        return View(party);
     }
 
 
@@ -448,10 +459,10 @@ public class PartierController : Controller
 
     private void UpdatePartyTotalPoints(int partyId)
     {
-        
+
         var party = _context.Parties
             .Include(p => p.PartyUsers) // relația PartyPartiers
-            .ThenInclude(pp => pp.Partier) 
+            .ThenInclude(pp => pp.Partier)
             .FirstOrDefault(p => p.Id == partyId);
 
         if (party == null)
@@ -464,24 +475,110 @@ public class PartierController : Controller
     }
 
     [HttpGet]
-    public IActionResult EditAccount()
+    public IActionResult PartyTasks(int id)
     {
-        var currentUserId = GetCurrentUserId();
-        var user = _context.Users.FirstOrDefault(u => u.Id == currentUserId);
+        // Preluăm petrecerea din baza de date, incluzând task-urile asociate
+        var tasks = _context.Tasks.Where(x => x.PartyId == id).ToList();
 
-        if (user == null)
+        if (tasks == null)
         {
-            return NotFound("User not found.");
+            return NotFound(); // Dacă nu găsim petrecerea, returnăm un 404
         }
 
-        return View(user);
+        // Trimitem task-urile către view
+        return View(tasks);
     }
-    
+
+
+    [HttpPost]
+    public IActionResult ClaimTask(int taskId, int partyId)
+    {
+        var task = _context.Tasks.FirstOrDefault(t => t.Id == taskId && t.PartyId == partyId);
+
+        if (task != null)
+        {
+            // Preluăm utilizatorul logat
+            var currentUserId = GetCurrentUserId(); // ID-ul userului logat
+            var currentPartier = _context.Partiers
+                                         .FirstOrDefault(p => p.UserId == currentUserId);
+
+            if (currentPartier != null)
+            {
+                // Asociem task-ul userului logat
+                task.PartierId = currentPartier.Id;
+                _context.SaveChanges();
+            }
+        }
+
+        return RedirectToAction("PartyDetails", new { id = partyId });
+    }
+
+    [HttpGet]
+    public IActionResult AddTask(int partyId)
+    {
+        var viewModel = new AddTaskViewModel
+        {
+            PartyId = partyId
+        };
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    public IActionResult AddTask(AddTaskViewModel viewModel)
+    {
+        if (ModelState.IsValid)
+        {
+            var task = new TaskModel
+            {
+                PartyId = viewModel.PartyId,
+                Name = viewModel.Name,
+                Points = viewModel.Points,
+                IsCompleted = false // Setăm implicit la "necompletat"
+            };
+
+            _context.Tasks.Add(task);
+            _context.SaveChanges();
+
+            return RedirectToAction("PartyDetails", new { id = viewModel.PartyId });
+        }
+
+        return View(viewModel); // Returnează același view pentru erori
+    }
 
 
 
+    [HttpPost]
+    public IActionResult ToggleTaskCompletion(int taskId, int partyId)
+    {
+        var task = _context.Tasks.FirstOrDefault(t => t.Id == taskId && t.PartyId == partyId);
 
+        if (task != null && task.PartierId.HasValue)
+        {
+            // Preluăm Partier-ul asociat task-ului
+            var partier = _context.Partiers.FirstOrDefault(p => p.Id == task.PartierId);
 
+            if (partier != null)
+            {
+                // Verificăm și schimbăm starea task-ului
+                if (!task.IsCompleted)
+                {
+                    // Dacă task-ul nu este completat, îl completăm și adăugăm punctele
+                    task.IsCompleted = true;
+                    partier.Points += task.Points; // Adaugăm punctele la Partier
+                }
+                else
+                {
+                    // Dacă era deja completat, îl setăm ca necompletat și scădem punctele
+                    task.IsCompleted = false;
+                    partier.Points -= task.Points; // Scădem punctele din Partier
+                }
+
+                _context.SaveChanges();
+            }
+        }
+
+        return RedirectToAction("PartyDetails", new { id = partyId });
+    }
 
 
 }

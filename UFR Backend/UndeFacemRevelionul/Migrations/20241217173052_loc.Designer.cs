@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UndeFacemRevelionul.ContextModels;
 
@@ -11,9 +12,10 @@ using UndeFacemRevelionul.ContextModels;
 namespace UndeFacemRevelionul.Migrations
 {
     [DbContext(typeof(RevelionContext))]
-    partial class RevelionContextModelSnapshot : ModelSnapshot
+    [Migration("20241217173052_loc")]
+    partial class loc
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,6 +90,7 @@ namespace UndeFacemRevelionul.Migrations
                         .HasColumnType("real");
 
                     b.Property<int?>("ProviderId")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<float>("Rating")
@@ -362,7 +365,7 @@ namespace UndeFacemRevelionul.Migrations
                     b.Property<int?>("PartierModelId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PartyId")
+                    b.Property<int>("PartyId")
                         .HasColumnType("int");
 
                     b.Property<int?>("PartyModelId")
@@ -435,7 +438,8 @@ namespace UndeFacemRevelionul.Migrations
                     b.HasOne("UndeFacemRevelionul.Models.ProviderModel", "Provider")
                         .WithMany("Locations")
                         .HasForeignKey("ProviderId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Provider");
                 });
@@ -577,7 +581,8 @@ namespace UndeFacemRevelionul.Migrations
                     b.HasOne("UndeFacemRevelionul.Models.PartyModel", "Party")
                         .WithMany()
                         .HasForeignKey("PartyId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("UndeFacemRevelionul.Models.PartyModel", null)
                         .WithMany("Tasks")
