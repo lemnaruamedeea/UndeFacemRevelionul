@@ -1,12 +1,13 @@
 ﻿@using UndeFacemRevelionul.ViewModels
 
 <h2>Selectează o Locatie</h2>
+<p>Total Party Points: <strong>@Model.TotalPoints</strong></p>
 
 <table class="table">
     <thead>
         <tr>
             <th>Nume</th>
-			<th>Adresă</th>
+            <th>Adresă</th>
             <th>Descriere</th>
             <th>Preț</th>
             <th>Rating</th>
@@ -23,7 +24,17 @@
                 <td>@location.Name</td>
                 <td>@location.Address</td>
                 <td>@location.Description</td>
-                <td>@location.Price</td>
+                <td>
+                    @if (Model.TotalPoints > 10000)
+                    {
+                        <span style="text-decoration: line-through;">@location.Price</span>
+                        <span style="color: green; font-weight: bold;">@((location.Price * 0.9).ToString("F2"))</span>
+                    }
+                    else
+                    {
+                        @location.Price
+                    }
+                </td>
                 <td>@location.Rating</td>
                 <td>@location.Provider?.User.Name</td>
                 <td>@location.Capacity</td>
@@ -39,13 +50,14 @@
                             data-provider="@location.Provider?.User.Name"
                             data-capacity="@location.Capacity"
                             data-date="@location.Date">
-						Detalii
+                        Detalii
                     </button>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
 
 <!-- Modal pentru afișarea detaliilor meniului -->
 <div class="modal fade" id="locationModal" tabindex="-1" aria-labelledby="locationModalLabel" aria-hidden="true">
@@ -59,7 +71,11 @@
                 <h4 id="locationName"></h4>
                 <p><strong>Adresa:</strong> <span id="locationAddress"></span></p>
                 <p><strong>Descriere:</strong> <span id="locationDescription"></span></p>
-                <p><strong>Preț:</strong> <span id="locationPrice"></span></p>
+                <p>
+                    <strong>Preț:</strong>
+                    <span id="locationPriceOriginal" style="text-decoration: line-through; display: none;"></span>
+                    <span id="locationPrice"></span>
+                </p>
                 <p><strong>Rating:</strong> <span id="locationRating"></span></p>
                 <p><strong>Furnizor:</strong> <span id="locationProvider"></span></p>
                 <p><strong>Capacitate:</strong> <span id="locationCapacity"></span></p>
@@ -76,31 +92,47 @@
     </div>
 </div>
 
+
 @section Scripts {
     <script>
-        // Script pentru a popula modalul cu detalii despre meniu
         var locationModal = document.getElementById('locationModal');
         locationModal.addEventListener('show.bs.modal', function (event) {
             var button = event.relatedTarget;
             var id = button.getAttribute('data-id');
             var name = button.getAttribute('data-name');
             var address = button.getAttribute('data-address');
-            var price = button.getAttribute('data-price');
+            var price = parseFloat(button.getAttribute('data-price'));
             var description = button.getAttribute('data-description');
             var rating = button.getAttribute('data-rating');
             var provider = button.getAttribute('data-provider');
             var capacity = button.getAttribute('data-capacity');
             var date = button.getAttribute('data-date');
+            var totalPoints = @Model.TotalPoints; // Valoare transmisă din backend
 
+            // Completează detaliile locației
             document.getElementById('locationName').innerText = name;
             document.getElementById('locationAddress').innerText = address;
             document.getElementById('locationDescription').innerText = description;
-            document.getElementById('locationPrice').innerText = price;
             document.getElementById('locationRating').innerText = rating;
             document.getElementById('locationProvider').innerText = provider;
             document.getElementById('locationCapacity').innerText = capacity;
             document.getElementById('locationDate').innerText = date;
             document.getElementById('locationId').value = id;
+
+            // Afișează prețul cu sau fără reducere
+            var priceElement = document.getElementById('locationPrice');
+            var priceOriginalElement = document.getElementById('locationPriceOriginal');
+
+            if (totalPoints > 10000) {
+                var discountedPrice = (price * 0.9).toFixed(2); // Reducere de 10%
+                priceOriginalElement.style.display = "inline"; // Afișează prețul original tăiat
+                priceOriginalElement.innerText = price.toFixed(2);
+                priceElement.innerText = discountedPrice;
+            } else {
+                priceOriginalElement.style.display = "none"; // Ascunde prețul original
+                priceElement.innerText = price.toFixed(2);
+            }
         });
     </script>
 }
+
