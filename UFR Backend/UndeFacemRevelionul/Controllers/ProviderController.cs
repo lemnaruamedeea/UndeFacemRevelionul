@@ -165,23 +165,37 @@ namespace UndeFacemRevelionul.Controllers
         }
 
         // ADD MENU
+        // ADD MENU
         [HttpGet]
         public IActionResult AddMenu()
         {
             var currentUserId = GetCurrentUserId();
             var provider = _context.Providers.FirstOrDefault(p => p.UserId == currentUserId);
-            if (provider == null)
-                return NotFound();
 
-            return View(new FoodMenuModel { ProviderId = provider.Id });
+            if (provider == null)
+                return NotFound("Provider not found.");
+
+            ViewBag.ProviderId = provider.Id;
+            return View();
         }
 
         [HttpPost]
-        public IActionResult AddMenu(FoodMenuModel menu)
+        public IActionResult AddMenu(AddMenuViewModel menu)
         {
             if (ModelState.IsValid)
             {
-                _context.FoodMenus.Add(menu);
+                //var providerId = GetCurrentUserId();
+                var providerId = _context.Providers.Where(p => p.UserId == GetCurrentUserId()).Select(nume => nume.Id).FirstOrDefault();
+                _context.FoodMenus.Add(new FoodMenuModel
+                {
+
+                    Name = menu.Name,
+                    ProviderId = providerId,
+                    Price = menu.Price,
+                    Description = menu.Description,
+                    Rating = menu.Rating,
+                    MenuFilePath = "n/a"
+                });
                 _context.SaveChanges();
                 return RedirectToAction("Dashboard");
             }

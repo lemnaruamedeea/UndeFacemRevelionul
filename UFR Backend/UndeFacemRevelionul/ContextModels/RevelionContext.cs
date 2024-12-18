@@ -118,6 +118,12 @@ public class RevelionContext : DbContext
         .IsRequired(false)
         .OnDelete(DeleteBehavior.Cascade); // Comportament la ștergere
 
+        modelBuilder.Entity<FoodMenuModel>()
+        .HasOne(l => l.Provider)
+        .WithMany(p => p.FoodMenus) // Relație de 1:N
+        .HasForeignKey(l => l.ProviderId)
+        .IsRequired(false)
+        .OnDelete(DeleteBehavior.Cascade); // Comportament la ștergere
 
         // One-to-Many: Provider and FoodMenus
         modelBuilder.Entity<ProviderModel>()

@@ -25,7 +25,7 @@
                 <td>@location.Description</td>
                 <td>@location.Price</td>
                 <td>@location.Rating</td>
-                <td>@location.Provider?.User?.Name ?? "Fără furnizor"</td>
+                <td>@location.Provider?.User.Name</td>
                 <td>@location.Capacity</td>
                 <td>@location.Date</td>
                 <td>
@@ -36,7 +36,7 @@
                             data-price="@location.Price"
                             data-description="@location.Description"
                             data-rating="@location.Rating"
-                            data-provider="@location.Provider?.User?.Name ?? " Fără furnizor""
+                            data-provider="@location.Provider?.User.Name"
                             data-capacity="@location.Capacity"
                             data-date="@location.Date">
 						Detalii

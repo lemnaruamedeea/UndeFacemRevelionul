@@ -14,8 +14,10 @@ namespace UndeFacemRevelionul.ViewModels
 
         [Required(ErrorMessage = "Price is required.")]
         [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than zero.")]
-        public decimal Price { get; set; }
-
-        public int ProviderId { get; set; } // ID-ul furnizorului care adaugă meniul
+        public int ProviderId { get; set; } // ID-ul furnizorului care adaugă locația
+        public float Price { get; set; }
+        public float Rating { get; set; }
+        //public DateTime Date { get; set; }
+        public string? MenuFilePath { get; set; }
     }
 }

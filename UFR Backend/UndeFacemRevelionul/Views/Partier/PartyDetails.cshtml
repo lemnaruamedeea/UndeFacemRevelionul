@@ -4,8 +4,8 @@
 <p>Party date: @Model.Date.ToString("d")</p>
 <p>Total budget: @Model.TotalBudget</p>
 <p>Remaining budget: @Model.RemainingBudget</p>
-<p>Location: @Model.Location.Name</p>
-<p>Menu: @Model.FoodMenu.Name</p>
+<p>Location: @Model.Location?.Name</p>
+<p>Menu: @Model.FoodMenu?.Name</p>
 <p>Party Points: @Model.TotalPoints</p>
 
 <h3>Members</h3>

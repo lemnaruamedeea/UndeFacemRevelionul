@@ -7,10 +7,12 @@ namespace UndeFacemRevelionul.Controllers
     public class AdminController : Controller
     {
         private readonly RevelionContext _context;
+        private readonly ILogger<AccountController> _logger;
 
-        public AdminController(RevelionContext context)
+        public AdminController(RevelionContext context, ILogger<AccountController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // Metoda pentru dashboard
@@ -100,25 +102,52 @@ namespace UndeFacemRevelionul.Controllers
             // Caută utilizatorul în baza de date
             var user = _context.Users.FirstOrDefault(u => u.Id == id);
 
+            //var currentUserId = GetCurrentUserId();
             if (user != null)
             {
-                if(user.UserRole == "Provider")
+                if (user.UserRole == "Provider")
                 {
-                    // Șterge providerul din baza de date
                     var provider = _context.Providers.FirstOrDefault(p => p.UserId == id);
-                    var locations = _context.Locations.Where(s => s.ProviderId == provider.Id).ToList();
-                    var menus = _context.FoodMenus.Where(s => s.ProviderId == provider.Id).ToList();
-                    _context.Providers.Remove(provider);
-                    _context.Locations.RemoveRange(locations);
-                    _context.FoodMenus.RemoveRange(menus);
+                    if (provider != null)
+                    {
+                        var menus = _context.FoodMenus.Where(s => s.ProviderId == provider.Id).ToList();
+                        foreach (var menu in menus)
+                        {
+                            var parties = _context.Parties.Where(p => p.FoodMenuId == menu.Id).ToList();
+                            foreach (var party in parties)
+                            {
+                                party.FoodMenuId = null;  // Or set it to another valid FoodMenuId
+                                _context.Parties.Update(party);
+                            }
+                        }
+                        var locations = _context.Locations.Where(s => s.ProviderId == provider.Id).ToList();
+                        foreach (var loc in locations)
+                        {
+                            var parties = _context.Parties.Where(p => p.LocationId == loc.Id).ToList();
+                            foreach (var party in parties)
+                            {
+                                party.LocationId = null;  // Or set it to another valid FoodMenuId
+                                _context.Parties.Update(party);
+                            }
+                        }
+
+                        _context.FoodMenus.RemoveRange(menus);
+                        _context.Locations.RemoveRange(locations);
+                        _context.Providers.Remove(provider);
+                    }
                 }
+
+
                 else if (user.UserRole == "Partier")
                 {
-                    // Șterge petrecărețul din baza de date
-                    var partier = _context.Partiers.FirstOrDefault(p => p.UserId == id);
-                    _context.Partiers.Remove(partier);
+                    var partier = _context.Partiers.FirstOrDefault(p => p.UserId == user.Id);
+                    if (partier != null)
+                    {
+                        _context.Partiers.Remove(partier);
+                    }
                 }
-                
+
+
                 _context.Users.Remove(user);
                 _context.SaveChanges();
                 TempData["SuccessMessage"] = "Utilizatorul a fost șters cu succes!";
@@ -129,10 +158,42 @@ namespace UndeFacemRevelionul.Controllers
             }
 
             // Redirecționează înapoi la lista de petrecăreți
-            return RedirectToAction("PartiersList");
+            return RedirectToAction("Dashboard");
         }
 
 
+        private int GetCurrentUserId()
+        {
+            // Verifică dacă utilizatorul este autentificat
+            if (!User.Identity.IsAuthenticated)
+            {
+                _logger.LogError("User is not authenticated.");
+                throw new InvalidOperationException("User is not authenticated.");
+            }
+
+            // Adaugă log pentru a verifica ce claim-uri sunt disponibile
+            var claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
+            foreach (var claim in claims)
+            {
+                _logger.LogInformation($"Claim Type: {claim.Type}, Value: {claim.Value}");
+            }
+
+            // Căutăm Claim-ul pentru NameIdentifier
+            var userIdClaim = User.FindFirst("UserId");
+
+
+            if (userIdClaim == null)
+            {
+                _logger.LogError("User does not have a valid ID claim.");
+                throw new InvalidOperationException("User does not have a valid ID claim.");
+            }
+
+            // Returnează ID-ul utilizatorului
+            return int.Parse(userIdClaim.Value);
+        }
+
     }
+
+
 
 }

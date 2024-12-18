@@ -6,7 +6,7 @@ using System.Security.Claims;
 using UndeFacemRevelionul.ContextModels;
 using UndeFacemRevelionul.Models;
 using UndeFacemRevelionul.ViewModels;
-using System.Linq; // Asigură-te că ai adăugat acest using
+using System.Linq; 
 
 namespace UndeFacemRevelionul.Controllers;
 
@@ -235,10 +235,6 @@ public class PartierController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult EditParty(PartyModel updatedParty)
     {
-        if (!ModelState.IsValid)
-        {
-            return View(updatedParty);
-        }
 
         var party = _context.Parties.FirstOrDefault(p => p.Id == updatedParty.Id);
 
@@ -247,14 +243,21 @@ public class PartierController : Controller
             return NotFound();
         }
 
+        // Update only the required fields
         party.Name = updatedParty.Name;
         party.TotalBudget = updatedParty.TotalBudget;
         party.RemainingBudget = updatedParty.RemainingBudget;
         party.Date = updatedParty.Date;
-        party.LocationId = updatedParty.LocationId;
-        party.FoodMenuId = updatedParty.FoodMenuId;
 
         _context.SaveChanges();
+
+        if (!ModelState.IsValid)
+        {
+            foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+            {
+                _logger.LogError(error.ErrorMessage);
+            }
+        }
 
         return RedirectToAction("PartyDetails", new { id = party.Id });
     }
@@ -316,7 +319,8 @@ public class PartierController : Controller
     {
         // Obține meniurile împreună cu informațiile despre furnizor
         var menus = _context.FoodMenus
-            .Include(m => m.Provider) // Include detalii despre Provider
+            .Include(m => m.Provider)
+            .ThenInclude(p => p.User)
             .ToList();
 
         var viewModel = new ListMenusViewModel
@@ -352,7 +356,8 @@ public class PartierController : Controller
     {
         // Obține meniurile împreună cu informațiile despre furnizor
         var locations = _context.Locations
-            .Include(l => l.Provider) // Include detalii despre Provider
+            .Include(l => l.Provider)
+            .ThenInclude(p => p.User)
             .ToList();
 
         var viewModel = new ListLocationsViewModel

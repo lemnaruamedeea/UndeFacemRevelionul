@@ -10,7 +10,7 @@
         public string Description { get; set; }
         public float Rating { get; set; }
         public float Price { get; set; }
-        public string MenuFilePath { get; set; }
+        public string? MenuFilePath { get; set; }
         public ICollection<PartyModel>? Parties { get; set; }  // Back-reference
 
     }
