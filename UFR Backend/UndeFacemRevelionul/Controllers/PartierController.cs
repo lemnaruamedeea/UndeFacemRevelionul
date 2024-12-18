@@ -438,46 +438,42 @@ public class PartierController : Controller
 
 
 
-    
+
 
     [HttpGet]
     public IActionResult AddTask(int partyId)
     {
-        // Transmite partyId în view pentru a ști la ce petrecere se adaugă taskul
-        ViewBag.PartyId = partyId;
-
-        return View();
+        var viewModel = new AddTaskViewModel
+        {
+            PartyId = partyId
+        };
+        return View(viewModel);
     }
 
     [HttpPost]
-    public IActionResult AddTask(int partyId, TaskModel task)
+    public IActionResult AddTask(AddTaskViewModel viewModel)
     {
         if (ModelState.IsValid)
         {
-            // Asociază taskul cu partyId
-            task.PartyId = partyId;
-            //task.Party = partyId;
-            // Adaugă taskul în baza de date
+            var task = new TaskModel
+            {
+                PartyId = viewModel.PartyId,
+                Name = viewModel.Name,
+                Points = viewModel.Points,
+                IsCompleted = false // Setăm implicit la "necompletat"
+            };
+
             _context.Tasks.Add(task);
             _context.SaveChanges();
 
-            // Redirecționează către lista de taskuri a petrecerii
-            return RedirectToAction("PartyTasks", new { id = partyId });
-        }
-        if (!ModelState.IsValid)
-        {
-            foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-            {
-                _logger.LogError(error.ErrorMessage);
-            }
+            return RedirectToAction("PartyDetails", new { id = viewModel.PartyId });
         }
 
-
-        // Dacă formularul nu e valid, retrimite view-ul
-        ViewBag.PartyId = partyId;
-        return RedirectToAction("PartyTasks", new { id = partyId });
-
+        return View(viewModel); // Returnează același view pentru erori
     }
+
+
+
     [HttpPost]
     public IActionResult ToggleTaskCompletion(int taskId, int partyId)
     {

@@ -1,30 +1,22 @@
-﻿@model UndeFacemRevelionul.Models.TaskModel
+﻿@model UndeFacemRevelionul.ViewModels.AddTaskViewModel
 
-@{
-    ViewBag.Title = "Add Task";
-}
-
-<h1>Add Task</h1>
+<h2>Add Task</h2>
 
 <form asp-action="AddTask" method="post">
-    <input type="hidden" name="partyId" value="@ViewBag.PartyId" />
-    <input type="hidden" name="Party" value="@{new PartyModel();}" />
+    <input type="hidden" asp-for="PartyId" />
 
     <div class="form-group">
-        <label asp-for="Name">Task Name</label>
-        <input asp-for="Name" class="form-control" placeholder="Enter task name" />
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" required />
+        <span asp-validation-for="Name" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label asp-for="Points">Points</label>
-        <input asp-for="Points" class="form-control" type="number" placeholder="Enter points" />
-    </div>
-
-    <div class="form-group">
-        <label asp-for="IsCompleted">Is Completed?</label>
-        <input asp-for="IsCompleted" type="checkbox" />
+        <label asp-for="Points"></label>
+        <input asp-for="Points" class="form-control" type="number" min="0" required />
+        <span asp-validation-for="Points" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-success">Add Task</button>
-    <a asp-action="PartyTasks" asp-route-id="@ViewBag.PartyId" class="btn btn-secondary">Back to Tasks</a>
+    <a asp-action="PartyDetails" asp-route-id="@Model.PartyId" class="btn btn-secondary">Cancel</a>
 </form>

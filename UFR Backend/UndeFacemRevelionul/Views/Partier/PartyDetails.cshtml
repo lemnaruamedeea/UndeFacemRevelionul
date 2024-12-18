@@ -37,9 +37,9 @@
 <a asp-action="AddMember" asp-route-partyId="@Model.Id" class="btn btn-success">Add member</a>
 <a href="@Url.Action("EditParty", "Partier", new { id = Model.Id })" class="btn btn-primary">Edit Party</a>
 <a href="@Url.Action("DeleteParty", "Partier", new { id = Model.Id })" class="btn btn-danger">Delete Party</a>
+</br>
 <!-- My Tasks Section -->
-<h2>My Tasks</h2>
-<h3>Taskuri pentru petrecere</h3>
+<h2>Tasks</h2>
 
 @if (ViewBag.AllTasks != null && (ViewBag.AllTasks as IEnumerable<UndeFacemRevelionul.Models.TaskModel>)?.Any() == true)
 {
@@ -92,4 +92,5 @@ else
 
 
 <!-- Buton pentru a naviga la PartyTasks -->
-<a href="@Url.Action("PartyTasks", "Partier", new { id = Model.Id })" class="btn btn-primary">View All Tasks</a>
+<a asp-action="AddTask" asp-route-partyId="@Model.Id" class="btn btn-primary">Add Task</a>
+
