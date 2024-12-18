@@ -19,7 +19,6 @@
   <ItemGroup>
     <Folder Include="Services\" />
     <Folder Include="Views\Provider\" />
-     <Folder Include="Views\Admin\" />
 
   </ItemGroup>
 

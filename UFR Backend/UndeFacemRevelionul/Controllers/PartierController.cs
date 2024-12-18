@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using UndeFacemRevelionul.ContextModels;
 using UndeFacemRevelionul.Models;
 using UndeFacemRevelionul.ViewModels;
+using System.Linq; // Asigură-te că ai adăugat acest using
 
 namespace UndeFacemRevelionul.Controllers;
 
@@ -171,8 +172,11 @@ public class PartierController : Controller
 
         // Căutăm petrecerea după ID
         var party = _context.Parties
+            .Include(p => p.FoodMenu) // Încarcă meniul asociat
+            .Include(p => p.Location) // Încarcă meniul asociat
             .Include(p => p.PartyUsers)  // Include utilizatorii petrecerii
             .ThenInclude(pu => pu.Partier)  // Include informațiile despre partieri
+            .ThenInclude(pa => pa.User)   // Încarcă detaliile utilizatorului
             .FirstOrDefault(p => p.Id == id);
 
         if (party == null)
@@ -296,6 +300,79 @@ public class PartierController : Controller
         return View();
     }
 
+    [HttpGet]
+    public IActionResult ListMenus(int partyId)
+    {
+        // Obține meniurile împreună cu informațiile despre furnizor
+        var menus = _context.FoodMenus
+            .Include(m => m.Provider) // Include detalii despre Provider
+            .ToList();
+
+        var viewModel = new ListMenusViewModel
+        {
+            PartyId = partyId,
+            Menus = menus
+        };
+
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult AddMenuToParty(int partyId, int menuId)
+    {
+        var party = _context.Parties.FirstOrDefault(p => p.Id == partyId);
+        if (party == null)
+            return NotFound();
+
+        var menu = _context.FoodMenus.Find(menuId);
+        if (menu == null)
+            return NotFound();
+
+        // Asociem meniul la petrecere
+        party.FoodMenuId = menu.Id;
+        _context.SaveChanges();
+
+        return RedirectToAction("Dashboard", new { id = partyId });
+    }
+
+    [HttpGet]
+    public IActionResult ListLocations(int partyId)
+    {
+        // Obține meniurile împreună cu informațiile despre furnizor
+        var locations = _context.Locations
+            .Include(l => l.Provider) // Include detalii despre Provider
+            .ToList();
+
+        var viewModel = new ListLocationsViewModel
+        {
+            PartyId = partyId,
+            Locations = locations
+        };
+
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult AddLocationToParty(int partyId, int locationId)
+    {
+        var party = _context.Parties.FirstOrDefault(p => p.Id == partyId);
+        if (party == null)
+            return NotFound();
+
+        var location = _context.Locations.Find(locationId);
+        if (location == null)
+            return NotFound();
+
+        // Asociem meniul la petrecere
+        party.LocationId = location.Id;
+        _context.SaveChanges();
+
+        return RedirectToAction("Dashboard", new { id = partyId });
+    }
+
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult AddMember(int partyId, string email)
@@ -385,8 +462,6 @@ public class PartierController : Controller
         party.TotalPoints = totalPoints;
         _context.SaveChanges();
     }
-
-
 
     [HttpGet]
     public IActionResult EditAccount()

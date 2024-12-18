@@ -1,0 +1,26 @@
+﻿<h2>Lista Petrecăreți</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nume</th>
+            <th>Email</th>
+            <th>Acțiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var partier in Model)
+        {
+            <tr>
+                <td>@partier.Name</td>
+                <td>@partier.Email</td>
+                <td>
+                    <form action="@Url.Action("DeleteUser", "Admin")" method="post" onsubmit="return confirm('Ești sigur că vrei să ștergi acest utilizator?');">
+                        <input type="hidden" name="id" value="@partier.Id" />
+                        <button type="submit" class="btn btn-danger">Șterge</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
