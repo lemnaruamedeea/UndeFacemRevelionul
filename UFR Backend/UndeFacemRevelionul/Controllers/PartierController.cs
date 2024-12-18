@@ -262,6 +262,7 @@ public class PartierController : Controller
         return RedirectToAction("PartyDetails", new { id = party.Id });
     }
 
+
     // GET: DeleteParty (Confirmare)
     [HttpGet]
     public IActionResult DeleteParty(int id)
@@ -360,14 +361,39 @@ public class PartierController : Controller
             .ThenInclude(p => p.User)
             .ToList();
 
+        var party = _context.Parties
+            .Include(p => p.PartyUsers)
+                .ThenInclude(pu => pu.Partier) // Include Partier
+            .Include(p => p.Location) // Include Location pentru preț
+            .FirstOrDefault(p => p.Id == partyId);
+
+        if (party == null)
+        {
+            return NotFound("Party not found.");
+        }
+
+        // Calculează totalul punctelor
+        int totalPoints = party.PartyUsers?.Sum(pu => pu.Partier.Points) ?? 0;
+
+        // Aplică reducerea dacă punctele depășesc 10.000
+        float? discountedPrice = null;
+        if (totalPoints > 10000 && party.Location != null)
+        {
+            discountedPrice = party.Location.Price * 0.9f; // Reducere de 10%
+        }
+
         var viewModel = new ListLocationsViewModel
         {
             PartyId = partyId,
-            Locations = locations
+            Locations = locations,
+            TotalPoints = totalPoints,
+            DiscountedPrice = discountedPrice
         };
+
 
         return View(viewModel);
     }
+
 
     [HttpPost]
     [ValidateAntiForgeryToken]

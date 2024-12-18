@@ -1,16 +1,16 @@
 ﻿@using UndeFacemRevelionul.ViewModels
 
-<h2>Selectează un Meniu</h2>
+<h2>Select a menu option</h2>
 
 <table class="table">
     <thead>
         <tr>
-            <th>Nume</th>
-            <th>Descriere</th>
-            <th>Preț</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Price</th>
             <th>Rating</th>
-            <th>Furnizor</th>
-            <th>Acțiuni</th>
+            <th>Provider</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -48,12 +48,12 @@
             </div>
             <div class="modal-body">
                 <h4 id="menuName"></h4>
-                <p><strong>Descriere:</strong> <span id="menuDescription"></span></p>
-                <p><strong>Preț:</strong> <span id="menuPrice"></span>
-                    <strong> Preț Nou:</strong> <span id="menuPrice"></span>
+                <p><strong>Description:</strong> <span id="menuDescription"></span></p>
+                <p><strong>Price:</strong> <span id="menuPrice"></span>
+                    
                 </p>
                 <p><strong>Rating:</strong> <span id="menuRating"></span></p>
-                <p><strong>Furnizor:</strong> <span id="menuProvider"></span></p>
+                <p><strong>Provider:</strong> <span id="menuProvider"></span></p>
             </div>
             <div class="modal-footer">
                 <form asp-action="AddMenuToParty" method="post">

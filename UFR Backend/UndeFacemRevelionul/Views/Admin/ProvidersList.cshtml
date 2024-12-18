@@ -1,10 +1,10 @@
-﻿<h2>Lista Petrecăreți</h2>
+﻿<h2>Providers List</h2>
 <table class="table">
     <thead>
         <tr>
-            <th>Nume</th>
+            <th>Name</th>
             <th>Email</th>
-            <th>Acțiuni</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -14,9 +14,9 @@
                 <td>@partier.Name</td>
                 <td>@partier.Email</td>
                 <td>
-                    <form action="@Url.Action("DeleteUser", "Admin")" method="post" onsubmit="return confirm('Ești sigur că vrei să ștergi acest utilizator?');">
+                    <form action="@Url.Action("DeleteUser", "Admin")" method="post" onsubmit="return confirm('Are you sure you want to delete this user?');">
                         <input type="hidden" name="id" value="@partier.Id" />
-                        <button type="submit" class="btn btn-danger">Șterge</button>
+                        <button type="submit" class="btn btn-danger">Delete</button>
                     </form>
                 </td>
             </tr>
