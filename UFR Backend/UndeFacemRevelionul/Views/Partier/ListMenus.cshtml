@@ -19,7 +19,17 @@
             <tr>
                 <td>@menu.Name</td>
                 <td>@menu.Description</td>
-                <td>@menu.Price</td>
+                <td>
+                    @if (Model.TotalPoints > 10000)
+                    {
+                        <span style="text-decoration: line-through;">@menu.Price</span>
+                        <span style="color: green; font-weight: bold;">@((menu.Price * 0.9).ToString("F2"))</span>
+                    }
+                    else
+                    {
+                        @menu.Price
+                    }
+                </td>
                 <td>@menu.Rating</td>
                 <td>@menu.Provider?.User.Name</td>
                 <td>
@@ -49,7 +59,9 @@
             <div class="modal-body">
                 <h4 id="menuName"></h4>
                 <p><strong>Description:</strong> <span id="menuDescription"></span></p>
-                <p><strong>Price:</strong> <span id="menuPrice"></span>
+                <p><strong>Price:</strong>
+                    <span id="menuPriceOriginal" style="text-decoration: line-through; display: none;"></span>
+                    <span id="menuPrice"></span>
                     
                 </p>
                 <p><strong>Rating:</strong> <span id="menuRating"></span></p>
@@ -74,17 +86,30 @@
             var button = event.relatedTarget;
             var id = button.getAttribute('data-id');
             var name = button.getAttribute('data-name');
-            var price = button.getAttribute('data-price');
+            var price = parseFloat(button.getAttribute('data-price'));
             var description = button.getAttribute('data-description');
             var rating = button.getAttribute('data-rating');
             var provider = button.getAttribute('data-provider');
+            var totalPoints = @Model.TotalPoints; // Valoare transmisă din backend
 
             document.getElementById('menuName').innerText = name;
             document.getElementById('menuDescription').innerText = description;
-            document.getElementById('menuPrice').innerText = price;
             document.getElementById('menuRating').innerText = rating;
             document.getElementById('menuProvider').innerText = provider;
             document.getElementById('menuId').value = id;
+
+            var priceElement = document.getElementById('menuPrice');
+            var priceOriginalElement = document.getElementById('menuPriceOriginal');
+
+            if (totalPoints > 10000) {
+                var discountedPrice = (price * 0.9).toFixed(2); // Reducere de 10%
+                priceOriginalElement.style.display = "inline"; // Afișează prețul original tăiat
+                priceOriginalElement.innerText = price.toFixed(2);
+                priceElement.innerText = discountedPrice;
+            } else {
+                priceOriginalElement.style.display = "none"; // Ascunde prețul original
+                priceElement.innerText = price.toFixed(2);
+            }
         });
     </script>
 }
