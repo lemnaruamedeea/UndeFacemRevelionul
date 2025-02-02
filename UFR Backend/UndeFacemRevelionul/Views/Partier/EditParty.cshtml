@@ -2,7 +2,7 @@
 
 <h2>Edit</h2>
 
-<form asp-action="EditParty" method="post">
+<form asp-action="EditParty" method="post" onsubmit="showLoading()">
     <input type="hidden" asp-for="Id" />
     <div class="form-group">
         <label asp-for="Name"></label>

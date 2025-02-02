@@ -1,0 +1,42 @@
+De adaugat:
+
+
+TASK-uri: 
+- task-uri default (ex. gasire locatie/meniu, implementare playlist, adaugare superstitii) + de verificat la check daca sunt completate 
+- nr. limitat de task-uri cu limita de puncte (pe zi) pe persoana
+- de gandit un sistem de restrictii
+
+SUPERSTITII:
+- de adaugat superstitii, asemanator cu tasks
+- poza cu dovada pentru puncte
+
+INTERFATA:
+- timer 
+- clase bootstrap, culori frumoase, stelute, disco, artificii
+- imagini 
+- dupa ce adaugi locatie/meniu sa te duca pe pagina petrecerii curente
+
+
+PLAYLIST:
+- de implementat
+
+GAMIFICATION:
+- roata norocului pe zi
+
+WISHLIST
+- de implementat (eventual)
+
+LOCATII
+- de adaugat locatie proprie (o locatie proprie/petrecere)
+- de implementat o locatie/petrecere (sa nu poata fi adaugata si altundeva)
+- filtre
+- restrictii cu nr de persoane
+
+MANCARE
+- de adaugat mancare proprie (o mancare proprie/petrecere)
+- filtre
+- restrictii cu nr de persoane
+- reducere
+
+PARTY
+- sa dispara automat petrecerea daca nu mai e nimeni in ea

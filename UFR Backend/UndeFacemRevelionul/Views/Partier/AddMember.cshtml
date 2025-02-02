@@ -14,7 +14,7 @@
     <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
 }
 
-<form asp-action="AddMember" method="post">
+<form asp-action="AddMember" method="post" onsubmit="showLoading()">
     <input type="hidden" name="partyId" value="@ViewBag.PartyId" />
     <div class="form-group">
         <label for="email">Member email</label>

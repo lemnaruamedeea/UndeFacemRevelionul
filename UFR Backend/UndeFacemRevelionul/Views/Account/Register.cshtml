@@ -6,7 +6,7 @@
 
 <h2>Register</h2>
 
-<form method="post" enctype="multipart/form-data">
+<form method="post" enctype="multipart/form-data" onsubmit="showLoading()">
     @Html.AntiForgeryToken()
 
     <div class="form-group">

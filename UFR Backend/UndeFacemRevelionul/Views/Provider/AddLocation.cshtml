@@ -2,7 +2,7 @@
 
 <h2>Add Location</h2>
 
-<form asp-action="AddLocation" method="post">
+<form asp-action="AddLocation" method="post" onsubmit="showLoading()">
     <input type="hidden" asp-for="ProviderId" value="@ViewBag.ProviderId" />
 
     <div class="form-group">

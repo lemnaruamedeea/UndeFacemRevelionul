@@ -2,7 +2,7 @@
 
 <h2>Edit Menu</h2>
 
-<form asp-action="EditMenu" method="post">
+<form asp-action="EditMenu" method="post" onsubmit="showLoading()">
     <div>
         <label for="Name">Menu Name</label>
         <input type="text" id="Name" name="Name" value="@Model.Name" />

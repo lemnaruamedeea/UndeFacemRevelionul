@@ -347,6 +347,7 @@ public class PartierController : Controller
 
         // Asociem meniul la petrecere
         party.FoodMenuId = menu.Id;
+        //party.RemainingBudget = party.TotalBudget - menu.Price - party.Location.Price;
         _context.SaveChanges();
 
         return RedirectToAction("Dashboard", new { id = partyId });
@@ -407,8 +408,11 @@ public class PartierController : Controller
         if (location == null)
             return NotFound();
 
+
+
         // Asociem meniul la petrecere
         party.LocationId = location.Id;
+        //party.RemainingBudget = party.TotalBudget - location.Price - party.FoodMenu.Price;
         _context.SaveChanges();
 
         return RedirectToAction("Dashboard", new { id = partyId });
