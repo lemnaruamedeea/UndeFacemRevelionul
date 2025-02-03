@@ -324,10 +324,27 @@ public class PartierController : Controller
             .ThenInclude(p => p.User)
             .ToList();
 
+        var party = _context.Parties
+        .Include(p => p.PartyUsers)
+            .ThenInclude(pu => pu.Partier) // Include Partier
+        .Include(p => p.FoodMenu) // Include FoodMenu pentru preț
+        .FirstOrDefault(p => p.Id == partyId);
+
+        int totalPoints = party.PartyUsers?.Sum(pu => pu.Partier.Points) ?? 0;
+
+        // Aplică reducerea dacă punctele depășesc 10.000
+        float? discountedPrice = null;
+        if (totalPoints > 10000 && party.Location != null)
+        {
+            discountedPrice = party.Location.Price * 0.9f; // Reducere de 10%
+        }
+
         var viewModel = new ListMenusViewModel
         {
             PartyId = partyId,
-            Menus = menus
+            Menus = menus,
+            TotalPoints = totalPoints,
+            DiscountedPrice = discountedPrice
         };
 
         return View(viewModel);

@@ -1,6 +1,12 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\UFR Backend",
+    "\\UFR Backend\\UndeFacemRevelionul",
+    "\\UFR Backend\\UndeFacemRevelionul\\Controllers",
+    "\\UFR Frontend",
+    "\\UndeFacemRevelionul"
   ],
+  "SelectedNode": "\\UFR Backend\\UndeFacemRevelionul\\Controllers\\PartierController.cs",
   "PreviewInSolutionExplorer": false
 }
