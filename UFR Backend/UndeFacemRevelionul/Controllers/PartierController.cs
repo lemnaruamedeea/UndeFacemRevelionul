@@ -354,7 +354,9 @@ public class PartierController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult AddMenuToParty(int partyId, int menuId)
     {
-        var party = _context.Parties.FirstOrDefault(p => p.Id == partyId);
+        var party = _context.Parties
+            .Include(p => p.Location) // Asigurăm încărcarea locației
+            .FirstOrDefault(p => p.Id == partyId);
         if (party == null)
             return NotFound();
 
@@ -364,11 +366,17 @@ public class PartierController : Controller
 
         // Asociem meniul la petrecere
         party.FoodMenuId = menu.Id;
-        //party.RemainingBudget = party.TotalBudget - menu.Price - party.Location.Price;
+
+        // Calculăm RemainingBudget
+        var menuPrice = menu.Price;
+        var locationPrice = party.Location?.Price ?? 0; // Dacă locația este null, folosim 0
+        party.RemainingBudget = party.TotalBudget - menuPrice - locationPrice;
+
         _context.SaveChanges();
 
         return RedirectToAction("Dashboard", new { id = partyId });
     }
+
 
     [HttpGet]
     public IActionResult ListLocations(int partyId)
@@ -417,23 +425,32 @@ public class PartierController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult AddLocationToParty(int partyId, int locationId)
     {
-        var party = _context.Parties.FirstOrDefault(p => p.Id == partyId);
+        // Încărcăm party cu FoodMenu pentru a avea acces la prețul meniului
+        var party = _context.Parties
+            .Include(p => p.FoodMenu) // Încărcăm meniul asociat petrecerii
+            .FirstOrDefault(p => p.Id == partyId);
         if (party == null)
             return NotFound();
 
+        // Găsim locația selectată
         var location = _context.Locations.Find(locationId);
         if (location == null)
             return NotFound();
 
-
-
-        // Asociem meniul la petrecere
+        // Asociem locația la petrecere
         party.LocationId = location.Id;
-        //party.RemainingBudget = party.TotalBudget - location.Price - party.FoodMenu.Price;
+
+        // Calculăm RemainingBudget
+        float menuPrice = party.FoodMenu?.Price ?? 0; // Dacă FoodMenu este null, prețul este 0
+        float locationPrice = location.Price;
+        party.RemainingBudget = party.TotalBudget - locationPrice - menuPrice;
+
+        // Salvăm modificările în baza de date
         _context.SaveChanges();
 
         return RedirectToAction("Dashboard", new { id = partyId });
     }
+
 
 
     [HttpPost]

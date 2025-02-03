@@ -20,7 +20,7 @@ INTERFATA:
 PLAYLIST:
 - de implementat
 
-GAMIFICATION:
+GAMIFICATION: 
 - roata norocului pe zi
 
 WISHLIST
