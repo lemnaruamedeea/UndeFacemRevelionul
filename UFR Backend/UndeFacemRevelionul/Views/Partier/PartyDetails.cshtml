@@ -360,6 +360,68 @@ else
     </form>
 }
 
+<h2>Superstitions</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Points</th>
+            <th>Status</th>
+            <th>Proof</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var superstition in ViewBag.Superstitions)
+        {
+            <tr>
+                <td>@superstition.Name</td>
+                <td>@superstition.Points</td>
+                <td>@(superstition.IsCompleted ? "Completed" : "Not Completed")</td>
+
+                <td>
+                    @if (superstition.IsCompleted && !string.IsNullOrEmpty(superstition.ImagePath))
+                    {
+                        <!-- Afișează imaginea de dovadă dacă superstitiile sunt completate -->
+                        <img src="@superstition.ImagePath" alt="Proof Image" width="100" height="100" />
+                    }
+                    else
+                    {
+                        <!-- Dacă superstitiile nu sunt completate, nu arată imaginea -->
+                        <span>No image provided</span>
+                    }
+                </td>
+
+                <!-- Butonul "Complete" apare doar dacă superstitiile nu sunt completate -->
+                @if (!superstition.IsCompleted)
+                {
+                    <td>
+                        <form method="post" asp-action="CompleteSuperstition" asp-controller="Partier" enctype="multipart/form-data" style="display:inline;">
+                            <input type="hidden" name="superstitionId" value="@superstition.Id" />
+                            <input type="hidden" name="partyId" value="@superstition.PartyId" />
+
+                            <!-- Câmp pentru imaginea de încărcat doar dacă nu este completată -->
+                            <div class="form-group">
+                                <label for="Image">Provide an image as proof:</label>
+                                <input type="file" name="Image" class="form-control" required />
+                            </div>
+
+                            <button type="submit" class="btn btn-success">Complete</button>
+                        </form>
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+<a asp-action="AddSuperstition" asp-route-partyId="@Model.Id" class="btn btn-primary mt-3">
+    Add Superstition
+</a>
+
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         // Playlist primit din ViewBag

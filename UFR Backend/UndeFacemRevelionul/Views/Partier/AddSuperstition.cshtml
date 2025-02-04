@@ -1,0 +1,15 @@
+﻿@model UndeFacemRevelionul.ViewModels.AddSuperstitionViewModel
+
+<h2>Add Superstition</h2>
+
+<form asp-action="AddSuperstition" method="post">
+    <input type="hidden" asp-for="PartyId" />
+    <div>
+        <label asp-for="Name">Superstition</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Add</button>
+</form>
+
+<a asp-action="PartyDetails" asp-route-id="@Model.PartyId" class="btn btn-secondary mt-3">Back to Party Details</a>
