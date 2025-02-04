@@ -11,17 +11,20 @@
     </div>
 </div>
 
+
+
+<!-- Secțiunea de text "Selectează o locație" -->
+<div class="menu-selection">
+    <h2>Select a location</h2>
+</div>
+
+
 @if (TempData["ErrorMessage"] != null)
 {
     <div class="alert alert-danger">
         @TempData["ErrorMessage"]
     </div>
 }
-
-<!-- Secțiunea de text "Selectează o locație" -->
-<div class="menu-selection">
-    <h2>Select a location</h2>
-</div>
 
 <!-- FORMULAR DE FILTRARE -->
 <form method="get" asp-action="ListLocations">
@@ -86,12 +89,12 @@
                         @if (Model.TotalPoints > 10000 && Model.TotalPoints < 15000)
                         {
                             <span style="text-decoration: line-through;">@location.Price</span>
-                            <span style="color: green; font-weight: bold;">@((location.Price * 0.9).ToString("F2"))</span> <!-- Reducere de 10% -->
+                            <span style="color: lightgreen; font-weight: bold;">@((location.Price * 0.9).ToString("F2"))</span> <!-- Reducere de 10% -->
                         }
                         else if (Model.TotalPoints > 15000)
                         {
                             <span style="text-decoration: line-through;">@location.Price</span>
-                            <span style="color: green; font-weight: bold;">@((location.Price * 0.85).ToString("F2"))</span> <!-- Reducere de 15% -->
+                            <span style="color: lightgreen; font-weight: bold;">@((location.Price * 0.85).ToString("F2"))</span> <!-- Reducere de 15% -->
                         }
                     </td>
                     <td>@location.Rating</td>
