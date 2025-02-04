@@ -1,24 +1,215 @@
-﻿<h2>Parties List</h2>
-<table class="table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Nume</th>
-            <th>Data</th>
-            <th>Locație</th>
-            <th>Meniu</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var party in Model)
-        {
-                <tr>
-                    <td>@party.Id</td>
-                    <td>@party.Name</td>
-                    <td>@party.Date.ToString("dd/MM/yyyy")</td>
-                    <td>@(party.Location?.Name ?? "N/A")</td>
-                    <td>@(party.FoodMenu?.Name ?? "N/A")</td>
-                </tr>
+﻿@{
+    ViewData["Title"] = "Parties List";
+}
+
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        /* Stiluri globale */
+        body {
+            background: linear-gradient(to right, #ff99cc, #cc66ff, #9900cc);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            font-family: Arial, sans-serif;
+            flex-direction: column;
+            padding-top: 80px;
         }
-    </tbody>
-</table>
+
+        /* Bara de navigație */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to right, #660066, #4d004d);
+            padding: 15px 0;
+            text-align: center;
+            box-shadow: none;
+            z-index: 1000;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .navbar a {
+            color: white;
+            font-size: 1.6rem;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 0 20px;
+        }
+
+        .navbar .nav-buttons {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .navbar .nav-buttons a {
+            margin-left: 10px;
+            padding: 12px 30px;
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 1.4rem;
+            font-weight: bold;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+        }
+
+        .navbar .nav-buttons a:hover {
+            transform: scale(1.05);
+            background: linear-gradient(to right, #9900cc, #ff66b2);
+        }
+
+                /* Stiluri pentru butoanele de logout */
+                .navbar .nav-buttons form button {
+                    font-weight: bold; /* Face textul bold */
+                    font-size: 1.4rem;
+                    padding: 12px 30px;
+                    border-radius: 25px;
+                    border: none;
+                    background: linear-gradient(to right, #ff66b2, #9900cc);
+                    color: white;
+                    transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+                    height: 50px; /* Setează înălțimea fixă pentru butonul de Logout */
+                    width: 220px; /* Asigură că butonul are aceeași lățime ca și cel de Back to Dashboard */
+                    justify-content: center; /* Centrează textul pe orizontală */
+                    align-items: center; /* Centrează textul pe verticală */
+                }
+
+                    .navbar .nav-buttons form button:hover {
+                        transform: scale(1.05);
+                        background: linear-gradient(to right, #9900cc, #ff66b2);
+                    }
+
+
+        /* Stiluri pentru text cu gradient */
+        .gradient-text {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.8rem;
+            font-weight: bold;
+        }
+
+        /* Containerul principal pentru pagina de petrecere */
+        .dashboard-container {
+            max-width: 900px;
+            margin: 100px auto 50px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        /* Stiluri pentru butoane generice */
+        .btn-primary, .btn-danger, .btn-success {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            font-size: 1.2rem;
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            margin: 8px 0;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+        }
+
+        .btn-primary:hover, .btn-danger:hover, .btn-success:hover {
+            transform: scale(1.05);
+            background: linear-gradient(to right, #9900cc, #ff66b2);
+        }
+
+        /* Stilizare tabel */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 50px;
+        }
+
+        .table th, .table td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        .table th {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .table td {
+            background: rgba(255, 255, 255, 0.8);
+            color: #4d004d;
+            font-size: 1rem;
+        }
+
+        .table tr:hover {
+            background-color: #f3e6f9;
+        }
+
+        /* Buton pentru acțiuni tabel */
+        .btn-actions {
+            padding: 8px 20px;
+            border-radius: 15px;
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            font-weight: bold;
+            transition: transform 0.3s ease-in-out;
+            border: none;
+        }
+
+        .btn-actions:hover {
+            transform: scale(1.05);
+            background: linear-gradient(to right, #9900cc, #ff66b2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Bara de navigație -->
+    <div class="navbar">
+        <a href="/">Unde Facem Revelionul?</a>
+        <div class="nav-buttons">
+            <a href="@Url.Action("Dashboard", "Admin")" class="btn-secondary">Back to Dashboard</a>
+            <form asp-action="Logout" asp-controller="Account" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-danger">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Parties List</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nume</th>
+                    <th>Data</th>
+                    <th>Locație</th>
+                    <th>Meniu</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var party in Model)
+                {
+                    <tr>
+                        <td>@party.Id</td>
+                        <td>@party.Name</td>
+                        <td>@party.Date.ToString("dd/MM/yyyy")</td>
+                        <td>@(party.Location?.Name ?? "N/A")</td>
+                        <td>@(party.FoodMenu?.Name ?? "N/A")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

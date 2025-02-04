@@ -11,6 +11,23 @@
     <title>@ViewData["Title"]</title>
     <style>
         /* Stiluri pentru pagina de dashboard */
+        .alert {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
 
         /* Bara de navigație */
         .navbar {
@@ -227,6 +244,22 @@
 
     <!-- Conținutul dashboard-ului -->
     <div class="dashboard-container">
+
+        <!-- Mesajele de succes și eroare -->
+        @if (ViewBag.SuccessMessage != null)
+        {
+            <div class="alert alert-success">
+                @ViewBag.SuccessMessage
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">
+                @TempData["ErrorMessage"]
+            </div>
+        }
+
         <h1 class="gradient-text">Welcome, @userName!</h1>
 
         <p>Welcome to your Dashboard, where you can manage your events, view your profile, and more.</p>
@@ -263,6 +296,10 @@
 
         <h3>Create a New Party</h3>
         <a href="@Url.Action("CreateParty", "Partier")" class="btn-primary">Create</a>
+
+        <!-- Linkul către Roata Norocului -->
+        <h3>WheelOfFortune</h3>
+        <a href="@Url.Action("WheelOfFortune", "Partier")" class="btn-primary">Try your luck!</a>
 
         <h3>Account Management</h3>
         <a href="@Url.Action("Edit", "Account")" class="btn-primary">Edit Account</a>
