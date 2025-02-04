@@ -218,10 +218,124 @@ public class PartierController : Controller
         var partierNames = partyPartiers.Select(partier => partier.User.Name).ToList();
         ViewBag.PartierNames = partierNames;
 
+        var superstitions = _context.Superstitions
+        .Where(s => s.PartyId == id)
+        .ToList();
+        ViewBag.Superstitions = superstitions;
+
         UpdatePartyTotalPoints(id);
 
         return View(party);
     }
+
+    public IActionResult AddSuperstition(int partyId)
+    {
+        var model = new AddSuperstitionViewModel
+        {
+            PartyId = partyId
+        };
+
+        return View(model);
+    }
+
+    [HttpPost]
+    public IActionResult AddSuperstition(AddSuperstitionViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            TempData["ErrorMessage"] = "Invalid input data.";
+            return View(model);
+        }
+
+        var currentPartier = _context.Partiers.FirstOrDefault(p => p.UserId == GetCurrentUserId());
+        if (currentPartier == null)
+        {
+            TempData["ErrorMessage"] = "The current partier could not be found.";
+            return RedirectToAction("PartyDetails", new { id = model.PartyId });
+        }
+
+        var party = _context.Parties.FirstOrDefault(p => p.Id == model.PartyId);
+        if (party == null)
+        {
+            TempData["ErrorMessage"] = "Party not found.";
+            return RedirectToAction("Dashboard", "Partier");
+        }
+
+        var superstition = new SuperstitionModel
+        {
+            Name = model.Name,
+            Points = model.Points,
+            PartyId = model.PartyId,
+            PartierId = currentPartier.Id,
+            IsCompleted = false
+        };
+
+        try
+        {
+            _context.Superstitions.Add(superstition);
+            _context.SaveChanges();
+            TempData["SuccessMessage"] = "Superstition added successfully.";
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = "Error while adding superstition: " + ex.Message;
+        }
+
+        return RedirectToAction("PartyDetails", new { id = model.PartyId });
+    }
+
+
+
+
+    [HttpPost]
+    public async Task<IActionResult> CompleteSuperstition(SuperstitionCompletionViewModel model)
+    {
+        var superstition = await _context.Superstitions
+            .FirstOrDefaultAsync(s => s.Id == model.SuperstitionId && s.PartyId == model.PartyId);
+
+        if (superstition == null)
+        {
+            // Superstiția nu există
+            return NotFound();
+        }
+
+        // Dacă superstiția este completată
+        if (!superstition.IsCompleted)
+        {
+            // Dacă există o imagine
+            if (model.Image != null && model.Image.Length > 0)
+            {
+                // Salvează imaginea pe server
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", model.Image.FileName);
+
+                // Salvează imaginea în server
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.Image.CopyToAsync(stream);
+                }
+
+                // Salvează calea imaginii
+                superstition.ImagePath = "/images/" + model.Image.FileName;
+            }
+
+            // Marcam superstitiile ca completate si adaugam punctele
+            superstition.IsCompleted = true;
+
+            // Adăugăm punctele superstitiilor la totalul petrecerii
+            var party = await _context.Parties
+                .FirstOrDefaultAsync(p => p.Id == model.PartyId);
+
+            if (party != null)
+            {
+                party.TotalPoints += superstition.Points;
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        return RedirectToAction("PartyDetails", new { id = model.PartyId });
+    }
+
+
 
 
     // GET: EditParty
@@ -621,20 +735,43 @@ public class PartierController : Controller
 
     private void UpdatePartyTotalPoints(int partyId)
     {
-
+        // Găsim petrecerea și includem superstitiile
         var party = _context.Parties
-            .Include(p => p.PartyUsers) // relația PartyPartiers
-            .ThenInclude(pp => pp.Partier)
+            .Include(p => p.PartyUsers) // Relația PartyPartiers
+                .ThenInclude(pp => pp.Partier)
+            .Include(p => p.Superstitions) // Include superstitiile asociate petrecerii
             .FirstOrDefault(p => p.Id == partyId);
 
         if (party == null)
         {
             throw new Exception("Petrecerea nu a fost găsită.");
         }
+
+        // Calculăm punctele totale ale partierilor
         int totalPoints = party.PartyUsers.Sum(pu => pu.Partier.Points);
+
+        // Adăugăm punctele superstitiilor completate
+        var completedSuperstitionsPoints = party.Superstitions
+            .Where(s => s.IsCompleted)
+            .Sum(s => s.Points);
+
+        // Debug: Adăugăm loguri pentru a vedea ce se întâmplă
+        Debug.WriteLine($"Total Points from Party Users: {totalPoints}");
+        Debug.WriteLine($"Completed Superstitions Points: {completedSuperstitionsPoints}");
+
+        // Adăugăm punctele superstitiilor completate
+        totalPoints += completedSuperstitionsPoints;
+
+        // Debug: Verificăm totalul final de puncte
+        Debug.WriteLine($"Final Total Points for Party {partyId}: {totalPoints}");
+
+        // Setăm punctele totale ale petrecerii
         party.TotalPoints = totalPoints;
+
+        // Salvăm schimbările în baza de date
         _context.SaveChanges();
     }
+
 
     [HttpGet]
     public IActionResult PartyTasks(int id)
@@ -741,6 +878,9 @@ public class PartierController : Controller
 
         return RedirectToAction("PartyDetails", new { id = partyId });
     }
+
+
+
 
 
 }
