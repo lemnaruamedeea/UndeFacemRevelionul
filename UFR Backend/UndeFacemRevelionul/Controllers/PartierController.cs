@@ -815,7 +815,15 @@ public class PartierController : Controller
             if (task != null)
             {
                 task.IsCompleted = true; // Bifăm task-ul
-                partier.Points += task.Points;
+                if (partier != null)
+                {
+                    partier.Points += task.Points;
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Trebuie sa iti iei task!";
+                    return RedirectToAction("ListLocations", new { partyId });
+                }
             }
 
         }
