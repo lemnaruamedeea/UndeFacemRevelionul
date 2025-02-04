@@ -66,76 +66,56 @@ public class PartierController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult CreateParty(CreatePartyViewModel model)
     {
+        if (model.TotalBudget <= 0)
+        {
+            TempData["ErrorMessage"] = "Bugetul total trebuie să fie mai mare decât 0!";
+            return View(model);
+        }
+
         if (ModelState.IsValid)
         {
-            // Creăm petrecerea folosind datele din CreatePartyViewModel
             var party = new PartyModel
             {
                 Name = model.Name,
                 TotalBudget = model.TotalBudget,
-                RemainingBudget = model.TotalBudget, // Bugetul rămas este același ca bugetul total la început
+                RemainingBudget = model.TotalBudget, // Inițial, bugetul rămas este egal cu cel total
                 Date = model.Date,
-                TotalPoints = 0, // Punctele sunt 0 inițial
-                LocationId = model.LocationId, // Locația este opțională, se setează dacă există
-                FoodMenuId = model.FoodMenuId, // Meniul este opțional, se setează dacă există
-                PartyUsers = new List<PartyPartierModel>() // Inițializăm lista PartyUsers
+                TotalPoints = 0,
+                LocationId = model.LocationId,
+                FoodMenuId = model.FoodMenuId,
+                PartyUsers = new List<PartyPartierModel>()
             };
 
-            // Adăugăm petrecerea în baza de date
             _context.Parties.Add(party);
-            _context.SaveChanges(); // Salvează pentru a genera ID-ul petrecerii
+            _context.SaveChanges();
 
             var currentUserId = GetCurrentUserId();
-
-            // 2. Căutăm în baza de date `Partier`-ul care are `UserId` egal cu `currentUserId`
             var partier = _context.Partiers.FirstOrDefault(p => p.UserId == currentUserId);
 
             if (partier == null)
             {
-                // Dacă nu găsim un `Partier` cu acest `UserId`, ar trebui să tratezi această situație.
-                _logger.LogError($"Partier with UserId {currentUserId} not found.");
-                return RedirectToAction("Error", "Home"); // Sau alte acțiuni, în funcție de logică
+                _logger.LogError($"Partier cu UserId {currentUserId} nu a fost găsit.");
+                return RedirectToAction("Error", "Home");
             }
 
-            // 3. După ce am găsit `Partier`-ul, folosim ID-ul acestuia pentru a crea un `PartyPartierModel`
             var partyUser = new PartyPartierModel
             {
-                PartyId = party.Id, // ID-ul petrecerii
-                PartierId = partier.Id // ID-ul `Partier`-ului găsit din baza de date
+                PartyId = party.Id,
+                PartierId = partier.Id
             };
 
-            // Adăugăm utilizatorul curent în lista PartyUsers
             party.PartyUsers.Add(partyUser);
-
-
-
-
-            // Salvează relația între petrecere și utilizatorul creator
             _context.PartyPartiers.Add(partyUser);
-
-            // Salvează totul într-o singură operațiune
-            _context.SaveChanges(); // Salvează petrecerea și relația
+            _context.SaveChanges();
 
             UpdatePartyTotalPoints(party.Id);
 
-            // Redirecționare după succes
             return RedirectToAction("Dashboard", "Partier");
         }
 
-        // Dacă modelul nu este valid, loghează erorile
-        if (!ModelState.IsValid)
-        {
-            foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-            {
-                _logger.LogError($"Error in field: {error.ErrorMessage}");
-            }
-        }
-
-
-
-        // Reîncarcă formularul dacă există erori
         return View(model);
     }
+
 
     private int GetCurrentUserId()
     {
@@ -235,29 +215,39 @@ public class PartierController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult EditParty(PartyModel updatedParty)
     {
-
-        var party = _context.Parties.FirstOrDefault(p => p.Id == updatedParty.Id);
+        var party = _context.Parties
+            .Include(p => p.Location)
+            .Include(p => p.FoodMenu)
+            .FirstOrDefault(p => p.Id == updatedParty.Id);
 
         if (party == null)
         {
             return NotFound();
         }
 
-        // Update only the required fields
+        if (updatedParty.TotalBudget <= 0)
+        {
+            TempData["ErrorMessage"] = "Bugetul total trebuie să fie mai mare decât 0!";
+            return View(updatedParty);
+        }
+
         party.Name = updatedParty.Name;
         party.TotalBudget = updatedParty.TotalBudget;
-        party.RemainingBudget = updatedParty.RemainingBudget;
         party.Date = updatedParty.Date;
 
-        _context.SaveChanges();
+        float menuPrice = party.FoodMenu?.Price ?? 0;
+        float locationPrice = party.Location?.Price ?? 0;
+        float newRemainingBudget = updatedParty.TotalBudget - (menuPrice + locationPrice);
 
-        if (!ModelState.IsValid)
+        if (newRemainingBudget < 0)
         {
-            foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-            {
-                _logger.LogError(error.ErrorMessage);
-            }
+            TempData["ErrorMessage"] = "Bugetul rămas nu poate fi negativ! Ajustează bugetul total sau elimină locația/meniul.";
+            return View(updatedParty);
         }
+
+        party.RemainingBudget = newRemainingBudget;
+
+        _context.SaveChanges();
 
         return RedirectToAction("PartyDetails", new { id = party.Id });
     }
@@ -316,27 +306,55 @@ public class PartierController : Controller
     }
 
     [HttpGet]
-    public IActionResult ListMenus(int partyId)
+    public IActionResult ListMenus(int partyId, string search = "", float? minPrice = null, float? maxPrice = null, float? rating = null)
     {
-        // Obține meniurile împreună cu informațiile despre furnizor
-        var menus = _context.FoodMenus
+        var menusQuery = _context.FoodMenus
             .Include(m => m.Provider)
             .ThenInclude(p => p.User)
-            .ToList();
+            .AsQueryable(); // Pregătim interogarea
+
+        // Aplicăm filtrele doar dacă utilizatorul a completat câmpurile
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            menusQuery = menusQuery.Where(m => m.Name.Contains(search) || m.Description.Contains(search));
+        }
+
+        if (minPrice.HasValue)
+        {
+            menusQuery = menusQuery.Where(m => m.Price >= minPrice.Value);
+        }
+
+        if (maxPrice.HasValue)
+        {
+            menusQuery = menusQuery.Where(m => m.Price <= maxPrice.Value);
+        }
+
+        if (rating.HasValue)
+        {
+            menusQuery = menusQuery.Where(m => m.Rating == rating.Value);
+        }
+
+        var menus = menusQuery.ToList(); // Execută interogarea
 
         var party = _context.Parties
-        .Include(p => p.PartyUsers)
-            .ThenInclude(pu => pu.Partier) // Include Partier
-        .Include(p => p.FoodMenu) // Include FoodMenu pentru preț
-        .FirstOrDefault(p => p.Id == partyId);
+            .Include(p => p.PartyUsers)
+            .ThenInclude(pu => pu.Partier) // Include participanții
+            .Include(p => p.FoodMenu) // Include meniul pentru preț
+            .FirstOrDefault(p => p.Id == partyId);
 
+        if (party == null)
+        {
+            return NotFound("Party not found.");
+        }
+
+        // Calculăm totalul punctelor
         int totalPoints = party.PartyUsers?.Sum(pu => pu.Partier.Points) ?? 0;
 
-        // Aplică reducerea dacă punctele depășesc 10.000
+        // Aplicăm reducerea dacă punctele depășesc 10.000
         float? discountedPrice = null;
-        if (totalPoints > 10000 && party.Location != null)
+        if (totalPoints > 10000 && party.FoodMenu != null)
         {
-            discountedPrice = party.Location.Price * 0.9f; // Reducere de 10%
+            discountedPrice = party.FoodMenu.Price * 0.9f; // Reducere de 10%
         }
 
         var viewModel = new ListMenusViewModel
@@ -350,13 +368,15 @@ public class PartierController : Controller
         return View(viewModel);
     }
 
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult AddMenuToParty(int partyId, int menuId)
     {
         var party = _context.Parties
-            .Include(p => p.Location) // Asigurăm încărcarea locației
+            .Include(p => p.Location)
             .FirstOrDefault(p => p.Id == partyId);
+
         if (party == null)
             return NotFound();
 
@@ -364,13 +384,17 @@ public class PartierController : Controller
         if (menu == null)
             return NotFound();
 
-        // Asociem meniul la petrecere
-        party.FoodMenuId = menu.Id;
+        float locationPrice = party.Location?.Price ?? 0;
+        float newRemainingBudget = party.TotalBudget - menu.Price - locationPrice;
 
-        // Calculăm RemainingBudget
-        var menuPrice = menu.Price;
-        var locationPrice = party.Location?.Price ?? 0; // Dacă locația este null, folosim 0
-        party.RemainingBudget = party.TotalBudget - menuPrice - locationPrice;
+        if (newRemainingBudget < 0)
+        {
+            TempData["ErrorMessage"] = "Nu ai suficient buget pentru acest meniu!";
+            return RedirectToAction("ListMenus", new { partyId });
+        }
+
+        party.FoodMenuId = menu.Id;
+        party.RemainingBudget = newRemainingBudget;
 
         _context.SaveChanges();
 
@@ -378,19 +402,47 @@ public class PartierController : Controller
     }
 
 
+
     [HttpGet]
-    public IActionResult ListLocations(int partyId)
+    public IActionResult ListLocations(int partyId, string search = "", float? minPrice = null, float? maxPrice = null, int? capacity = null, float? rating = null)
     {
-        // Obține meniurile împreună cu informațiile despre furnizor
-        var locations = _context.Locations
+        var locationsQuery = _context.Locations
             .Include(l => l.Provider)
             .ThenInclude(p => p.User)
-            .ToList();
+            .AsQueryable(); // Transformă interogarea într-una flexibilă
+
+        // Aplicăm filtrele doar dacă sunt setate
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            locationsQuery = locationsQuery.Where(l => l.Name.Contains(search) || l.Address.Contains(search));
+        }
+
+        if (minPrice.HasValue)
+        {
+            locationsQuery = locationsQuery.Where(l => l.Price >= minPrice.Value);
+        }
+
+        if (maxPrice.HasValue)
+        {
+            locationsQuery = locationsQuery.Where(l => l.Price <= maxPrice.Value);
+        }
+
+        if (capacity.HasValue)
+        {
+            locationsQuery = locationsQuery.Where(l => l.Capacity == capacity.Value);
+        }
+
+        if (rating.HasValue)
+        {
+            locationsQuery = locationsQuery.Where(l => l.Rating == rating.Value);
+        }
+
+        var locations = locationsQuery.ToList(); // Execută interogarea în baza de date
 
         var party = _context.Parties
             .Include(p => p.PartyUsers)
-                .ThenInclude(pu => pu.Partier) // Include Partier
-            .Include(p => p.Location) // Include Location pentru preț
+            .ThenInclude(pu => pu.Partier)
+            .Include(p => p.Location)
             .FirstOrDefault(p => p.Id == partyId);
 
         if (party == null)
@@ -405,7 +457,7 @@ public class PartierController : Controller
         float? discountedPrice = null;
         if (totalPoints > 10000 && party.Location != null)
         {
-            discountedPrice = party.Location.Price * 0.9f; // Reducere de 10%
+            discountedPrice = party.Location.Price * 0.9f;
         }
 
         var viewModel = new ListLocationsViewModel
@@ -416,40 +468,43 @@ public class PartierController : Controller
             DiscountedPrice = discountedPrice
         };
 
-
         return View(viewModel);
     }
+
 
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult AddLocationToParty(int partyId, int locationId)
     {
-        // Încărcăm party cu FoodMenu pentru a avea acces la prețul meniului
         var party = _context.Parties
-            .Include(p => p.FoodMenu) // Încărcăm meniul asociat petrecerii
+            .Include(p => p.FoodMenu)
             .FirstOrDefault(p => p.Id == partyId);
+
         if (party == null)
             return NotFound();
 
-        // Găsim locația selectată
         var location = _context.Locations.Find(locationId);
         if (location == null)
             return NotFound();
 
-        // Asociem locația la petrecere
+        float menuPrice = party.FoodMenu?.Price ?? 0;
+        float newRemainingBudget = party.TotalBudget - location.Price - menuPrice;
+
+        if (newRemainingBudget < 0)
+        {
+            TempData["ErrorMessage"] = "Nu ai suficient buget pentru această locație!";
+            return RedirectToAction("ListLocations", new { partyId });
+        }
+
         party.LocationId = location.Id;
+        party.RemainingBudget = newRemainingBudget;
 
-        // Calculăm RemainingBudget
-        float menuPrice = party.FoodMenu?.Price ?? 0; // Dacă FoodMenu este null, prețul este 0
-        float locationPrice = location.Price;
-        party.RemainingBudget = party.TotalBudget - locationPrice - menuPrice;
-
-        // Salvăm modificările în baza de date
         _context.SaveChanges();
 
         return RedirectToAction("Dashboard", new { id = partyId });
     }
+
 
 
 

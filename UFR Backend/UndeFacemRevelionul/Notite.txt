@@ -1,4 +1,4 @@
-De adaugat:
+﻿De adaugat:
 
 
 TASK-uri: 
@@ -29,14 +29,18 @@ WISHLIST
 LOCATII
 - de adaugat locatie proprie (o locatie proprie/petrecere)
 - de implementat o locatie/petrecere (sa nu poata fi adaugata si altundeva)
-- filtre
+- filtre ✅
 - restrictii cu nr de persoane
 
 MANCARE
 - de adaugat mancare proprie (o mancare proprie/petrecere)
-- filtre
+- filtre ✅
 - restrictii cu nr de persoane
-- reducere
+- reducere ✅
+
+BUGET
+- bugetul si bugetul ramas sa nu poata fi negative ✅
+- actualizarea bugetului ramas daca s-a editat bugetul total al party-ului ✅
 
 PARTY
 - sa dispara automat petrecerea daca nu mai e nimeni in ea

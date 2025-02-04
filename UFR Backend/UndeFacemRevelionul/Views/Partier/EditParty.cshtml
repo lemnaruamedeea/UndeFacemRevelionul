@@ -1,4 +1,10 @@
 ﻿@model UndeFacemRevelionul.Models.PartyModel
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
 
 <h2>Edit</h2>
 
@@ -15,10 +21,6 @@
     <div class="form-group">
         <label asp-for="TotalBudget"></label>
         <input asp-for="TotalBudget" type="number" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="RemainingBudget"></label>
-        <input asp-for="RemainingBudget" type="number" class="form-control" />
     </div>
     <button type="submit" class="btn btn-primary">Save</button>
 </form>

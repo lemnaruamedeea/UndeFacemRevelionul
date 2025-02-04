@@ -1,12 +1,56 @@
 ﻿@using UndeFacemRevelionul.ViewModels
 
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
 <h2>Select a location</h2>
 
+<!-- FORMULAR DE FILTRARE -->
+<form method="get" asp-action="ListLocations">
+    <input type="hidden" name="partyId" value="@Model.PartyId" />
+
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <label for="search">Search (Name/Address):</label>
+            <input type="text" name="search" class="form-control" value="@Context.Request.Query["search"]" />
+        </div>
+        <div class="col-md-2">
+            <label for="minPrice">Min Price:</label>
+            <input type="number" step="0.01" name="minPrice" class="form-control" value="@Context.Request.Query["minPrice"]" />
+        </div>
+        <div class="col-md-2">
+            <label for="maxPrice">Max Price:</label>
+            <input type="number" step="0.01" name="maxPrice" class="form-control" value="@Context.Request.Query["maxPrice"]" />
+        </div>
+        <div class="col-md-2">
+            <label for="capacity">Capacity:</label>
+            <input type="number" name="capacity" class="form-control" value="@Context.Request.Query["capacity"]" />
+        </div>
+        <div class="col-md-2">
+            <label for="rating">Rating:</label>
+            <input type="number" step="0.1" name="rating" class="form-control" value="@Context.Request.Query["rating"]" />
+        </div>
+        <div class="col-md-1 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+        <div class="col-md-1 d-flex align-items-end">
+            <a href="@Url.Action("ListLocations", new { partyId = Model.PartyId })" class="btn btn-secondary">Reset</a>
+        </div>
+    </div>
+</form>
+
+<hr>
+
+<!-- TABEL CU LOCAȚII -->
 <table class="table">
     <thead>
         <tr>
             <th>Name</th>
-			<th>Adress</th>
+            <th>Address</th>
             <th>Description</th>
             <th>Price</th>
             <th>Rating</th>
@@ -23,7 +67,6 @@
                 <td>@location.Name</td>
                 <td>@location.Address</td>
                 <td>@location.Description</td>
-                
                 <td>
                     @if (Model.TotalPoints > 10000)
                     {
@@ -50,7 +93,7 @@
                             data-provider="@location.Provider?.User.Name"
                             data-capacity="@location.Capacity"
                             data-date="@location.Date">
-						Details
+                        Details
                     </button>
                 </td>
             </tr>
@@ -58,12 +101,12 @@
     </tbody>
 </table>
 
-<!-- Modal pentru afișarea detaliilor meniului -->
+<!-- MODAL DETALII LOCAȚIE -->
 <div class="modal fade" id="locationModal" tabindex="-1" aria-labelledby="locationModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="locationModalLabel">Detalii Locatie</h5>
+                <h5 class="modal-title" id="locationModalLabel">Location Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -84,13 +127,12 @@
                 <form asp-action="AddLocationToParty" method="post">
                     <input type="hidden" name="partyId" value="@Model.PartyId" />
                     <input type="hidden" name="locationId" id="locationId" />
-                    <button type="submit" class="btn btn-success">Adaugă la Petrecere</button>
+                    <button type="submit" class="btn btn-success">Add to Party</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
 
 @section Scripts {
     <script>
@@ -106,9 +148,8 @@
             var provider = button.getAttribute('data-provider');
             var capacity = button.getAttribute('data-capacity');
             var date = button.getAttribute('data-date');
-            var totalPoints = @Model.TotalPoints; // Valoare transmisă din backend
+            var totalPoints = @Model.TotalPoints;
 
-            // Completează detaliile locației
             document.getElementById('locationName').innerText = name;
             document.getElementById('locationAddress').innerText = address;
             document.getElementById('locationDescription').innerText = description;
@@ -118,17 +159,16 @@
             document.getElementById('locationDate').innerText = date;
             document.getElementById('locationId').value = id;
 
-            // Afișează prețul cu sau fără reducere
             var priceElement = document.getElementById('locationPrice');
             var priceOriginalElement = document.getElementById('locationPriceOriginal');
 
             if (totalPoints > 10000) {
-                var discountedPrice = (price * 0.9).toFixed(2); // Reducere de 10%
-                priceOriginalElement.style.display = "inline"; // Afișează prețul original tăiat
+                var discountedPrice = (price * 0.9).toFixed(2);
+                priceOriginalElement.style.display = "inline";
                 priceOriginalElement.innerText = price.toFixed(2);
                 priceElement.innerText = discountedPrice;
             } else {
-                priceOriginalElement.style.display = "none"; // Ascunde prețul original
+                priceOriginalElement.style.display = "none";
                 priceElement.innerText = price.toFixed(2);
             }
         });

@@ -1,0 +1,20 @@
+﻿<h2>Menus List</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Provider</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var menu in Model)
+        {
+            <tr>
+                <td>@menu.Id</td>
+                <td>@menu.Name</td>
+                <td>@(menu.Provider?.Name ?? "N/A")</td>
+            </tr>
+        }
+    </tbody>
+</table>

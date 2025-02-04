@@ -60,7 +60,7 @@ namespace UndeFacemRevelionul.Controllers
             return View(parties);
         }
 
-        public IActionResult LocationList ()
+        public IActionResult LocationsList ()
         {
             var locations = _context.Locations.ToList();
             return View(locations);
@@ -161,6 +161,46 @@ namespace UndeFacemRevelionul.Controllers
             return RedirectToAction("Dashboard");
         }
 
+        [HttpPost]
+        public IActionResult DeleteLocation(int id)
+        {
+            var location = _context.Locations.FirstOrDefault(l => l.Id == id);
+            if (location != null)
+            {
+                var parties = _context.Parties.Where(p => p.LocationId == id).ToList();
+                foreach (var party in parties)
+                {
+                    party.LocationId = null;
+                    _context.Parties.Update(party);
+                }
+
+                _context.Locations.Remove(location);
+                _context.SaveChanges();
+                TempData["SuccessMessage"] = "Locația a fost ștearsă cu succes!";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Locația nu a fost găsită!";
+            }
+            return RedirectToAction("LocationList");
+        }
+
+        [HttpPost]
+        public IActionResult DeleteFoodMenu(int id)
+        {
+            var menu = _context.FoodMenus.FirstOrDefault(m => m.Id == id);
+            if (menu != null)
+            {
+                _context.FoodMenus.Remove(menu);
+                _context.SaveChanges();
+                TempData["SuccessMessage"] = "Meniul a fost șters cu succes!";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Meniul nu a fost găsit!";
+            }
+            return RedirectToAction("MenusList");
+        }
 
         private int GetCurrentUserId()
         {
