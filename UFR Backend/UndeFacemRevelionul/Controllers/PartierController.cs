@@ -9,6 +9,7 @@ using UndeFacemRevelionul.ViewModels;
 using System.Linq;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Threading;
 
 namespace UndeFacemRevelionul.Controllers;
 
@@ -105,6 +106,15 @@ public class PartierController : Controller
                 PartyId = party.Id,
                 PartierId = partier.Id
             };
+
+            var defaultTasks = new List<TaskModel>
+            {
+                new TaskModel { PartyId = party.Id, Name = "Rezervare locație", IsCompleted = false, Points = 100 },
+                new TaskModel { PartyId = party.Id, Name = "Alegere meniu", IsCompleted = false, Points = 100 },
+                new TaskModel { PartyId = party.Id, Name = "Playlist", IsCompleted = false, Points = 100 }
+            };
+
+            _context.Tasks.AddRange(defaultTasks);
 
             party.PartyUsers.Add(partyUser);
             _context.PartyPartiers.Add(partyUser);
@@ -311,6 +321,9 @@ public class PartierController : Controller
         var partyPartiers = _context.PartyPartiers.Where(pp => pp.PartyId == id).ToList();
         _context.PartyPartiers.RemoveRange(partyPartiers);
 
+        var partyTasks = _context.Tasks.Where(t => t.PartyId == id).ToList();
+        _context.Tasks.RemoveRange(partyTasks);
+
         // Șterge petrecerea
         _context.Parties.Remove(party);
 
@@ -408,18 +421,61 @@ public class PartierController : Controller
     {
         var party = _context.Parties
             .Include(p => p.Location)
+            .Include(p => p.PartyUsers)
+                .ThenInclude(pu => pu.Partier)
+            .Include(p => p.FoodMenu)
             .FirstOrDefault(p => p.Id == partyId);
 
         if (party == null)
             return NotFound();
 
+        if (party != null)
+        {
+            party.FoodMenuId = menuId;
+
+            // Găsim task-ul "Alegere meniu"
+            var task = _context.Tasks.FirstOrDefault(t => t.PartyId == partyId && t.Name == "Alegere meniu");
+            var partier = _context.Partiers.FirstOrDefault(p => p.Id == task.PartierId);
+            if (task != null)
+            {
+                task.IsCompleted = true; // Bifăm task-ul
+                if (partier != null)
+                {
+                    partier.Points += task.Points;
+                }
+                else {
+                    TempData["ErrorMessage"] = "Trebuie sa iti iei task!";
+                    return RedirectToAction("ListMenus", new { partyId });
+                }
+            }
+
+        }
+
         var menu = _context.FoodMenus.Find(menuId);
         if (menu == null)
             return NotFound();
 
-        float locationPrice = party.Location?.Price ?? 0;
-        float newRemainingBudget = party.TotalBudget - menu.Price - locationPrice;
+        // Calculăm totalul punctelor
+        int totalPoints = party.PartyUsers?.Sum(pu => pu.Partier.Points) ?? 0;
 
+        // Aplicăm reducerea dacă punctele depășesc 10.000
+        float? discountedPrice = null;
+        if (totalPoints > 10000 && totalPoints < 15000 && party.FoodMenu != null)
+        {
+            discountedPrice = party.FoodMenu.Price * 0.9f; // Reducere de 10%
+        }
+
+        if (totalPoints > 15000 && party.FoodMenu != null)
+        {
+            discountedPrice = party.FoodMenu.Price * 0.85f; // Reducere de 15%
+        }
+
+        // Asigurăm că se folosește prețul redus dacă există
+        float menuPrice = discountedPrice ?? menu.Price;
+        float locationPrice = party.Location?.Price ?? 0;
+        float newRemainingBudget = party.TotalBudget - menuPrice - locationPrice;
+
+        
         if (newRemainingBudget < 0)
         {
             TempData["ErrorMessage"] = "Nu ai suficient buget pentru acest meniu!";
@@ -431,7 +487,7 @@ public class PartierController : Controller
 
         _context.SaveChanges();
 
-        return RedirectToAction("Dashboard", new { id = partyId });
+        return RedirectToAction("PartyDetails", new { id = partyId });
     }
 
 
@@ -517,18 +573,52 @@ public class PartierController : Controller
     {
         var party = _context.Parties
             .Include(p => p.FoodMenu)
+            .Include(p => p.PartyUsers)
+                .ThenInclude(pu => pu.Partier)
+            .Include(p => p.Location)
             .FirstOrDefault(p => p.Id == partyId);
 
         if (party == null)
             return NotFound();
 
+        if (party != null)
+        {
+            party.LocationId = locationId;
+
+            // Găsim task-ul "Rezervare locație"
+            var task = _context.Tasks.FirstOrDefault(t => t.PartyId == partyId && t.Name == "Rezervare locație");
+            var partier = _context.Partiers.FirstOrDefault(p => p.Id == task.PartierId);
+            if (task != null)
+            {
+                task.IsCompleted = true; // Bifăm task-ul
+                partier.Points += task.Points;
+            }
+
+        }
+
         var location = _context.Locations.Find(locationId);
         if (location == null)
             return NotFound();
 
-        float menuPrice = party.FoodMenu?.Price ?? 0;
-        float newRemainingBudget = party.TotalBudget - location.Price - menuPrice;
+        // Calculează totalul punctelor
+        int totalPoints = party.PartyUsers?.Sum(pu => pu.Partier.Points) ?? 0;
 
+        // Aplică reducerea dacă punctele depășesc 10.000
+        float? discountedPrice = null;
+        if (totalPoints > 10000 && totalPoints < 15000 && party.Location != null)
+        {
+            discountedPrice = party.Location.Price * 0.9f;
+        }
+
+        if (totalPoints > 15000 && party.Location != null)
+        {
+            discountedPrice = party.Location.Price * 0.85f;
+        }
+
+        float locationPrice = discountedPrice ?? location.Price;
+        float menuPrice = party.FoodMenu?.Price ?? 0;
+        float newRemainingBudget = party.TotalBudget - menuPrice - locationPrice;
+        
         if (newRemainingBudget < 0)
         {
             TempData["ErrorMessage"] = "Nu ai suficient buget pentru această locație!";
@@ -540,7 +630,7 @@ public class PartierController : Controller
 
         _context.SaveChanges();
 
-        return RedirectToAction("Dashboard", new { id = partyId });
+        return RedirectToAction("PartyDetails", new { id = partyId });
     }
 
 
@@ -721,24 +811,33 @@ public class PartierController : Controller
 
             if (partier != null)
             {
-                // Verificăm și schimbăm starea task-ului
-                if (!task.IsCompleted)
+
+                if (task.Name != "Alegere meniu" && task.Name != "Rezervare locație" && task.Name != "Playlist")
                 {
-                    // Dacă task-ul nu este completat, îl completăm și adăugăm punctele
-                    task.IsCompleted = true;
-                    partier.Points += task.Points; // Adaugăm punctele la Partier
+                    // Verificăm și schimbăm starea task-ului
+                    if (!task.IsCompleted)
+                    {
+                        // Dacă task-ul nu este completat, îl completăm și adăugăm punctele
+                        task.IsCompleted = true;
+                        partier.Points += task.Points; // Adaugăm punctele la Partier
+                    }
+                    else
+                    {
+                        // Dacă era deja completat, îl setăm ca necompletat și scădem punctele
+                        task.IsCompleted = false;
+                        partier.Points -= task.Points; // Scădem punctele din Partier
+                    }
                 }
+
                 else
                 {
-                    // Dacă era deja completat, îl setăm ca necompletat și scădem punctele
-                    task.IsCompleted = false;
-                    partier.Points -= task.Points; // Scădem punctele din Partier
+                    TempData["ErrorMessage"] = "Nu poți schimba starea acestui task!";
                 }
 
                 _context.SaveChanges();
             }
         }
-
+        UpdatePartyTotalPoints(partyId);
         return RedirectToAction("PartyDetails", new { id = partyId });
     }
 
