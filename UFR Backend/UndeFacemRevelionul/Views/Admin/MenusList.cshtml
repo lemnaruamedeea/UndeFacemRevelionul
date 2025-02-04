@@ -207,7 +207,6 @@
                 <tr>
                     <th>ID</th>
                     <th>Name</th>
-                    <th>Provider</th>
                 </tr>
             </thead>
             <tbody>
@@ -216,7 +215,12 @@
                     <tr>
                         <td>@menu.Id</td>
                         <td>@menu.Name</td>
-                        <td>@(menu.Provider?.Name ?? "N/A")</td>
+                        <td>
+                            <form asp-action="DeleteFoodMenu" method="post" style="display:inline;">
+                                <input type="hidden" name="id" value="@menu.Id" />
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Sigur vrei să ștergi acest meniu?');">Șterge</button>
+                            </form>
+                        </td>
                     </tr>
                 }
             </tbody>

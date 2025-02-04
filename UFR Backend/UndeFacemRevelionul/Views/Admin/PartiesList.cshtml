@@ -193,8 +193,6 @@
                     <th>ID</th>
                     <th>Nume</th>
                     <th>Data</th>
-                    <th>Locație</th>
-                    <th>Meniu</th>
                 </tr>
             </thead>
             <tbody>
@@ -204,8 +202,6 @@
                         <td>@party.Id</td>
                         <td>@party.Name</td>
                         <td>@party.Date.ToString("dd/MM/yyyy")</td>
-                        <td>@(party.Location?.Name ?? "N/A")</td>
-                        <td>@(party.FoodMenu?.Name ?? "N/A")</td>
                     </tr>
                 }
             </tbody>

@@ -182,7 +182,7 @@ namespace UndeFacemRevelionul.Controllers
             {
                 TempData["ErrorMessage"] = "Locația nu a fost găsită!";
             }
-            return RedirectToAction("LocationList");
+            return RedirectToAction("LocationsList");
         }
 
         [HttpPost]
