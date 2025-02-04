@@ -359,7 +359,7 @@ public class PartierController : Controller
 
         if (rating.HasValue)
         {
-            menusQuery = menusQuery.Where(m => m.Rating == rating.Value);
+            menusQuery = menusQuery.Where(m => m.Rating >= rating.Value);
         }
 
         var menus = menusQuery.ToList(); // Execută interogarea
@@ -457,12 +457,12 @@ public class PartierController : Controller
 
         if (capacity.HasValue)
         {
-            locationsQuery = locationsQuery.Where(l => l.Capacity == capacity.Value);
+            locationsQuery = locationsQuery.Where(l => l.Capacity >= capacity.Value);
         }
 
         if (rating.HasValue)
         {
-            locationsQuery = locationsQuery.Where(l => l.Rating == rating.Value);
+            locationsQuery = locationsQuery.Where(l => l.Rating >= rating.Value);
         }
 
         var locations = locationsQuery.ToList(); // Execută interogarea în baza de date
