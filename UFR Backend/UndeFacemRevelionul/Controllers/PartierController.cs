@@ -380,9 +380,14 @@ public class PartierController : Controller
 
         // Aplicăm reducerea dacă punctele depășesc 10.000
         float? discountedPrice = null;
-        if (totalPoints > 10000 && party.FoodMenu != null)
+        if (totalPoints > 10000 && totalPoints < 15000 && party.FoodMenu != null)
         {
             discountedPrice = party.FoodMenu.Price * 0.9f; // Reducere de 10%
+        }
+
+        if (totalPoints > 15000 && party.FoodMenu != null)
+        {
+            discountedPrice = party.FoodMenu.Price * 0.85f; // Reducere de 15%
         }
 
         var viewModel = new ListMenusViewModel
@@ -483,9 +488,14 @@ public class PartierController : Controller
 
         // Aplică reducerea dacă punctele depășesc 10.000
         float? discountedPrice = null;
-        if (totalPoints > 10000 && party.Location != null)
+        if (totalPoints > 10000 && totalPoints < 15000 && party.Location != null)
         {
             discountedPrice = party.Location.Price * 0.9f;
+        }
+
+        if (totalPoints > 15000 && party.Location != null)
+        {
+            discountedPrice = party.Location.Price * 0.85f;
         }
 
         var viewModel = new ListLocationsViewModel

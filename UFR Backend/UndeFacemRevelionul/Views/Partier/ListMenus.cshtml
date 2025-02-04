@@ -73,15 +73,16 @@
                 <td>@menu.Name</td>
                 <td>@menu.Description</td>
                 <td>
-                    @if (Model.TotalPoints > 10000)
-                    {
-                        <span style="text-decoration: line-through;">@menu.Price</span>
-                        <span style="color: green; font-weight: bold;">@((menu.Price * 0.9).ToString("F2"))</span>
-                    }
-                    else
-                    {
-                        @menu.Price
-                    }
+                        @if (Model.TotalPoints > 10000 && Model.TotalPoints < 15000)
+                        {
+                            <span style="text-decoration: line-through;">@menu.Price</span>
+                            <span style="color: green; font-weight: bold;">@((menu.Price * 0.9).ToString("F2"))</span> <!-- Reducere de 10% -->
+                        }
+                        else if (Model.TotalPoints > 15000)
+                        {
+                            <span style="text-decoration: line-through;">@menu.Price</span>
+                            <span style="color: green; font-weight: bold;">@((menu.Price * 0.85).ToString("F2"))</span> <!-- Reducere de 15% -->
+                        }
                 </td>
                 <td>@menu.Rating</td>
                 <td>@menu.Provider?.User.Name</td>

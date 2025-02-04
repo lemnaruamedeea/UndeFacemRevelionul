@@ -83,14 +83,15 @@
                     <td>@location.Address</td>
                     <td>@location.Description</td>
                     <td>
-                        @if (Model.TotalPoints > 10000)
+                        @if (Model.TotalPoints > 10000 && Model.TotalPoints < 15000)
                         {
                             <span style="text-decoration: line-through;">@location.Price</span>
-                            <span style="color: green; font-weight: bold;">@((location.Price * 0.9).ToString("F2"))</span>
+                            <span style="color: green; font-weight: bold;">@((location.Price * 0.9).ToString("F2"))</span> <!-- Reducere de 10% -->
                         }
-                        else
+                        else if (Model.TotalPoints > 15000)
                         {
-                            @location.Price
+                            <span style="text-decoration: line-through;">@location.Price</span>
+                            <span style="color: green; font-weight: bold;">@((location.Price * 0.85).ToString("F2"))</span> <!-- Reducere de 15% -->
                         }
                     </td>
                     <td>@location.Rating</td>
