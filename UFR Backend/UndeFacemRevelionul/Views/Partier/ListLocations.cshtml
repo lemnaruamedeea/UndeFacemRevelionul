@@ -1,67 +1,83 @@
 ﻿@using UndeFacemRevelionul.ViewModels
 
-<h2>Select a location</h2>
+<!-- Bara de sus stilizată cu fundal gradient -->
+<div class="navbar">
+    <a href="@Url.Action("Index", "Dashboard")" class="navbar-title">Unde Facem Revelionul?</a>
+    <div class="nav-buttons">
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Name</th>
-			<th>Adress</th>
-            <th>Description</th>
-            <th>Price</th>
-            <th>Rating</th>
-            <th>Provider</th>
-            <th>Capacity (no. of persons)</th>
-            <th>Date</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var location in Model.Locations)
-        {
+        <form asp-action="Logout" asp-controller="Account" method="post" style="display: inline;">
+            <button type="submit" class="btn-logout">Logout</button>
+        </form>
+    </div>
+</div>
+
+<!-- Secțiunea de text "Selectează o locație" -->
+<div class="menu-selection">
+    <h2>Selectează o locație</h2>
+</div>
+
+<!-- Tabelul cu locațiile -->
+<div class="content-container">
+    <table class="table custom-table">
+        <thead>
             <tr>
-                <td>@location.Name</td>
-                <td>@location.Address</td>
-                <td>@location.Description</td>
-                
-                <td>
-                    @if (Model.TotalPoints > 10000)
-                    {
-                        <span style="text-decoration: line-through;">@location.Price</span>
-                        <span style="color: green; font-weight: bold;">@((location.Price * 0.9).ToString("F2"))</span>
-                    }
-                    else
-                    {
-                        @location.Price
-                    }
-                </td>
-                <td>@location.Rating</td>
-                <td>@location.Provider?.User.Name</td>
-                <td>@location.Capacity</td>
-                <td>@location.Date</td>
-                <td>
-                    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#locationModal"
-                            data-id="@location.Id"
-                            data-name="@location.Name"
-                            data-address="@location.Address"
-                            data-price="@location.Price"
-                            data-description="@location.Description"
-                            data-rating="@location.Rating"
-                            data-provider="@location.Provider?.User.Name"
-                            data-capacity="@location.Capacity"
-                            data-date="@location.Date">
-						Details
-                    </button>
-                </td>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Rating</th>
+                <th>Provider</th>
+                <th>Capacity (no. of persons)</th>
+                <th>Date</th>
+                <th>Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var location in Model.Locations)
+            {
+                <tr>
+                    <td>@location.Name</td>
+                    <td>@location.Address</td>
+                    <td>@location.Description</td>
+                    <td>
+                        @if (Model.TotalPoints > 10000)
+                        {
+                            <span style="text-decoration: line-through;">@location.Price</span>
+                            <span style="color: green; font-weight: bold;">@((location.Price * 0.9).ToString("F2"))</span>
+                        }
+                        else
+                        {
+                            @location.Price
+                        }
+                    </td>
+                    <td>@location.Rating</td>
+                    <td>@location.Provider?.User.Name</td>
+                    <td>@location.Capacity</td>
+                    <td>@location.Date</td>
+                    <td>
+                        <button type="button" class="btn btn-info btn-details" data-bs-toggle="modal" data-bs-target="#locationModal"
+                                data-id="@location.Id"
+                                data-name="@location.Name"
+                                data-address="@location.Address"
+                                data-price="@location.Price"
+                                data-description="@location.Description"
+                                data-rating="@location.Rating"
+                                data-provider="@location.Provider?.User.Name"
+                                data-capacity="@location.Capacity"
+                                data-date="@location.Date">
+                            Detalii
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
-<!-- Modal pentru afișarea detaliilor meniului -->
+<!-- Modal pentru afișarea detaliilor locației -->
 <div class="modal fade" id="locationModal" tabindex="-1" aria-labelledby="locationModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content modal-styled">
             <div class="modal-header">
                 <h5 class="modal-title" id="locationModalLabel">Detalii Locatie</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -91,46 +107,193 @@
     </div>
 </div>
 
-
 @section Scripts {
     <script>
-        var locationModal = document.getElementById('locationModal');
-        locationModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var id = button.getAttribute('data-id');
-            var name = button.getAttribute('data-name');
-            var address = button.getAttribute('data-address');
-            var price = parseFloat(button.getAttribute('data-price'));
-            var description = button.getAttribute('data-description');
-            var rating = button.getAttribute('data-rating');
-            var provider = button.getAttribute('data-provider');
-            var capacity = button.getAttribute('data-capacity');
-            var date = button.getAttribute('data-date');
-            var totalPoints = @Model.TotalPoints; // Valoare transmisă din backend
+        document.addEventListener("DOMContentLoaded", function () {
+            var locationModal = document.getElementById('locationModal');
+            locationModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget; // Butonul care a declanșat modalul
 
-            // Completează detaliile locației
-            document.getElementById('locationName').innerText = name;
-            document.getElementById('locationAddress').innerText = address;
-            document.getElementById('locationDescription').innerText = description;
-            document.getElementById('locationRating').innerText = rating;
-            document.getElementById('locationProvider').innerText = provider;
-            document.getElementById('locationCapacity').innerText = capacity;
-            document.getElementById('locationDate').innerText = date;
-            document.getElementById('locationId').value = id;
+                // Extragem datele din atributele data-*
+                var id = button.getAttribute('data-id');
+                var name = button.getAttribute('data-name');
+                var address = button.getAttribute('data-address');
+                var price = parseFloat(button.getAttribute('data-price'));
+                var description = button.getAttribute('data-description');
+                var rating = button.getAttribute('data-rating');
+                var provider = button.getAttribute('data-provider');
+                        var capacity = button.getAttribute('data-capacity');
+                var date = button.getAttribute('data-date');
+                var totalPoints = @Model.TotalPoints; // Valoare transmisă din backend
 
-            // Afișează prețul cu sau fără reducere
-            var priceElement = document.getElementById('locationPrice');
-            var priceOriginalElement = document.getElementById('locationPriceOriginal');
+                // Le introducem în modal
+                document.getElementById('locationName').innerText = name;
+                document.getElementById('locationAddress').innerText = address;
+                document.getElementById('locationDescription').innerText = description;
+                document.getElementById('locationRating').innerText = rating;
+                document.getElementById('locationProvider').innerText = provider;
+                        document.getElementById('locationCapacity').innerText = capacity;
+                document.getElementById('locationDate').innerText = date;
+                document.getElementById('locationId').value = id;
 
-            if (totalPoints > 10000) {
-                var discountedPrice = (price * 0.9).toFixed(2); // Reducere de 10%
-                priceOriginalElement.style.display = "inline"; // Afișează prețul original tăiat
-                priceOriginalElement.innerText = price.toFixed(2);
-                priceElement.innerText = discountedPrice;
-            } else {
-                priceOriginalElement.style.display = "none"; // Ascunde prețul original
-                priceElement.innerText = price.toFixed(2);
-            }
-        });
+                        // Afișăm prețul cu sau fără reducere
+                var priceElement = document.getElementById('locationPrice');
+                var priceOriginalElement = document.getElementById('locationPriceOriginal');
+
+                if (totalPoints > 10000) {
+                    var discountedPrice = (price * 0.9).toFixed(2); // Reducere de 10%
+                    priceOriginalElement.style.display = "inline"; // Afișează prețul original tăiat
+                    priceOriginalElement.innerText = price.toFixed(2);
+                    priceElement.innerText = discountedPrice;
+                } else {
+                    priceOriginalElement.style.display = "none"; // Ascunde prețul original
+                        priceElement.innerText = price.toFixed(2);
+                        }
+                    });
+                });
     </script>
 }
+
+<!-- Stiluri personalizate -->
+<style>
+    /* General body and background */
+    body {
+        background: linear-gradient(to right, #ff99cc, #cc66ff, #9900cc);
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center; /* Aliniere pe verticală și orizontală */
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        color: white;
+        flex-direction: column;
+    }
+
+    /* Navbar styles */
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: linear-gradient(to right, #660066, #4d004d);
+        padding: 15px 0;
+        text-align: center;
+        box-shadow: none;
+        z-index: 1000;
+        font-family: 'Arial', sans-serif;
+    }
+
+        .navbar a {
+            color: white;
+            font-size: 1.6rem;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 0 20px;
+        }
+
+        .navbar .nav-buttons {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+            .navbar .nav-buttons a {
+                margin-left: 10px;
+                padding: 12px 30px;
+                background: linear-gradient(to right, #ff66b2, #9900cc);
+                color: white;
+                border-radius: 25px;
+                text-decoration: none;
+                font-size: 1.4rem;
+                font-weight: bold;
+                transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            }
+
+                .navbar .nav-buttons a:hover {
+                    transform: scale(1.05);
+                    background: linear-gradient(to right, #9900cc, #ff66b2);
+                }
+
+    /* Content section (just below navbar) */
+    .menu-selection {
+        margin-top: 100px; /* To avoid overlapping the navbar */
+        text-align: center;
+        width: 100%;
+    }
+
+    /* Tabelul personalizat */
+    .custom-table th, .custom-table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    /* Modal personalizat */
+    .modal-styled {
+        position: relative;
+        z-index: 1050; /* Asigură-te că este mai mare decât orice alt element din pagină */
+        border-radius: 8px;
+        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-body {
+        color: #4d004d; /* Setează o culoare mai închisă pentru textul din modal */
+    }
+
+    .modal-header h5 {
+        color: #9900cc; /* Culoare diferită pentru titlul modalului */
+    }
+
+    /* Button styles */
+    .btn-primary {
+        background: linear-gradient(to right, #ff66b2, #9900cc);
+        color: white;
+        padding: 12px 30px;
+        font-size: 1.4rem;
+        border-radius: 25px;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+        display: inline-block;
+        margin-top: 20px;
+    }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            background: linear-gradient(to right, #9900cc, #ff66b2);
+        }
+
+    .btn-secondary {
+        background: #4d004d;
+        color: white;
+        padding: 12px 30px;
+        font-size: 1.4rem;
+        border-radius: 25px;
+        text-decoration: none;
+        transition: transform 0.3s ease-in-out;
+    }
+
+        .btn-secondary:hover {
+            transform: scale(1.05);
+            background: #9900cc;
+        }
+
+    .btn-logout {
+        background: linear-gradient(to right, #ff66b2, #9900cc);
+        color: white;
+        padding: 12px 30px;
+        font-size: 1.4rem;
+        border-radius: 25px;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+        display: inline-block;
+        margin-top: 20px;
+    }
+
+        .btn-logout:hover {
+            transform: scale(1.05);
+            background: linear-gradient(to right, #9900cc, #ff66b2);
+        }
+</style>

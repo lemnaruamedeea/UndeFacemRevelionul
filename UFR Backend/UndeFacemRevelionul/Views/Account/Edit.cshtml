@@ -4,66 +4,332 @@
     ViewData["Title"] = "Edit Account";
 }
 
-<h2>Edit Account</h2>
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        /* Stiluri generale */
+        body {
+            background: linear-gradient(to right, #ff99cc, #cc66ff, #9900cc);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            font-family: Arial, sans-serif;
+            flex-direction: column;
+            padding-top: 80px; /* Mută formularul mai jos pentru a face loc pentru navbar */
+        }
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["SuccessMessage"]
+        /* Container pentru formă */
+        .register-container {
+            max-width: 500px;
+            margin: auto;
+            padding: 40px 20px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.8rem;
+            font-weight: bold;
+        }
+
+        /* Stiluri pentru formulare */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+            .form-group label {
+                font-size: 1.2rem;
+                font-weight: bold;
+                color: #4d004d;
+            }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid #ccc;
+            font-size: 1.1rem;
+            margin-top: 8px;
+            box-sizing: border-box;
+        }
+
+            .form-control:focus {
+                border-color: #9900cc;
+                outline: none;
+                box-shadow: 0 0 8px rgba(153, 0, 204, 0.5);
+            }
+
+        /* Buton personalizat */
+        .btn-primary {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            font-size: 1.4rem;
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+        }
+
+            .btn-primary:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+        .btn-danger {
+            background: linear-gradient(to right, #ff6666, #cc0000);
+            color: white;
+            font-size: 1.4rem;
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+        }
+
+            .btn-danger:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #cc0000, #ff6666);
+            }
+
+        /* Mesaj de succes */
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        /* Mesaj de eroare */
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        /* Buton Save Changes */
+        .btn-primary {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            font-size: 1.4rem;
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+        }
+
+            .btn-primary:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+        /* Buton Delete Account - Nuantă de mov-roz mai închis */
+        .btn-danger {
+            background: linear-gradient(to right, #660066, #4d004d); /* Nuantă mai închisă de mov-roz */
+            color: white;
+            font-size: 1.4rem;
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+        }
+
+            .btn-danger:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #4d004d, #660066); /* Nuantă mai închisă de mov-roz */
+            }
+
+        /* Buton Back to Dashboard - Același stil ca Save Changes */
+        .btn-secondary {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            font-size: 1.4rem;
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            text-decoration: none; /* Elimină sublinierea */
+        }
+
+            .btn-secondary:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+
+        .nav-buttons a,
+        .nav-buttons button {
+            display: inline-flex; /* Corectează alinierea verticală */
+            align-items: center; /* Centrează textul vertical */
+            justify-content: center; /* Centrează textul orizontal */
+            height: 50px; /* Setează aceeași înălțime pentru ambele */
+            padding: 12px 30px; /* Menține același stil vizual */
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            font-size: 1.4rem;
+            font-weight: bold;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            text-decoration: none; /* Elimină sublinierea de la link */
+            text-align: center;
+        }
+
+        .nav-buttons button {
+            border: none;
+            outline: none;
+        }
+
+            .nav-buttons a:hover,
+            .nav-buttons button:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+
+
+        /* Bara de navigație */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to right, #660066, #4d004d);
+            padding: 15px 0;
+            text-align: center;
+            box-shadow: none;
+            z-index: 1000;
+            font-family: 'Arial', sans-serif;
+        }
+
+            .navbar a {
+                color: white;
+                font-size: 1.6rem;
+                text-decoration: none;
+                font-weight: bold;
+                margin: 0 20px;
+            }
+
+            .navbar .nav-buttons {
+                position: absolute;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+                .navbar .nav-buttons a {
+                    margin-left: 10px;
+                    padding: 12px 30px;
+                    background: linear-gradient(to right, #ff66b2, #9900cc);
+                    color: white;
+                    border-radius: 25px;
+                    text-decoration: none;
+                    font-size: 1.4rem;
+                    font-weight: bold;
+                    transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+                }
+
+                    .navbar .nav-buttons a:hover {
+                        transform: scale(1.05);
+                        background: linear-gradient(to right, #9900cc, #ff66b2);
+                    }
+    </style>
+</head>
+<body>
+
+    <!-- Bara de navigație -->
+    <div class="navbar">
+        <a href="/">Unde Facem Revelionul?</a>
+        <div class="nav-buttons">
+            <a asp-action="Dashboard" asp-controller="Partier" class="btn-secondary">Back to Dashboard</a>
+            <form asp-action="Logout" asp-controller="Account" method="post" style="display:inline;">
+                <button type="submit" class="btn-secondary">Logout</button>
+            </form>
+        </div>
     </div>
-}
 
-<form method="post" enctype="multipart/form-data">
-    @Html.AntiForgeryToken()
+    <!-- Formularele de Editare Cont -->
+    <div class="register-container">
+        <h2 class="gradient-text">Edit Account</h2>
 
-    <div class="form-group">
-        <label for="Name">Name</label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <form method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label for="Name">Name</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="Email">Email</label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <!-- Pentru schimbarea parolei -->
+            <div class="form-group">
+                <label for="CurrentPassword">Current Password</label>
+                <input type="password" asp-for="CurrentPassword" class="form-control" />
+                <span asp-validation-for="CurrentPassword" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="NewPassword">New Password</label>
+                <input type="password" asp-for="NewPassword" class="form-control" />
+                <span asp-validation-for="NewPassword" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="ConfirmNewPassword">Confirm New Password</label>
+                <input type="password" asp-for="ConfirmNewPassword" class="form-control" />
+                <span asp-validation-for="ConfirmNewPassword" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn-primary">Save Changes</button>
+        </form>
+
+        <br />
+
+        <!-- Buton Delete Account -->
+        <form asp-action="Delete" method="post" onsubmit="return confirm('Are you sure you want to delete your account?');">
+            <button type="submit" class="btn-danger">Delete Account</button>
+        </form>
+
+        <br />
+
+        @{
+            string controllerName = User.IsInRole("Partier") ? "Partier" : User.IsInRole("Provider") ? "Provider" : "Admin";
+        }
+
+        <!-- Buton Back to Dashboard -->
+        <a asp-action="Dashboard" asp-controller="@controllerName" class="btn-secondary">Back to Dashboard</a>
     </div>
 
-    <div class="form-group">
-        <label for="Email">Email</label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-
-     <!--div class="form-group">
-         <!--label for="ProfilePicture">Profile Picture</!--label>
-         <!--input type="file" asp-for="ProfilePicture" class="form-control" />
-     </--div>
-
-    <!-- Password Change Section -->
-    <div class="form-group">
-        <label for="CurrentPassword">Current Password</label>
-        <input type="password" asp-for="CurrentPassword" class="form-control" />
-        <span asp-validation-for="CurrentPassword" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label for="NewPassword">New Password</label>
-        <input type="password" asp-for="NewPassword" class="form-control" />
-        <span asp-validation-for="NewPassword" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label for="ConfirmNewPassword">Confirm New Password</label>
-        <input type="password" asp-for="ConfirmNewPassword" class="form-control" />
-        <span asp-validation-for="ConfirmNewPassword" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Save Changes</button>
-</form>
-
-<br />
-
-<form asp-action="Delete" method="post" onsubmit="return confirm('Are you sure you want to delete your account?');">
-    <button type="submit" class="btn btn-danger">Delete Account</button>
-</form>
-
-<br />
-@{
-    string controllerName = User.IsInRole("Partier") ? "Partier" : User.IsInRole("Provider") ? "Provider" : "Admin";
-}
-
-<a asp-action="Dashboard" asp-controller="@controllerName" class="btn btn-secondary">Back to Dashboard</a>
+</body>
+</html>

@@ -4,29 +4,182 @@
     ViewData["Title"] = "Login";
 }
 
-<h2>Login</h2>
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        /* Stiluri generale */
+        body {
+            background: linear-gradient(to right, #ff99cc, #cc66ff, #9900cc);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            font-family: Arial, sans-serif;
+            flex-direction: column;
+        }
 
-<form method="post">
-    @Html.AntiForgeryToken()
+        /* Container pentru formă */
+        .login-container {
+            max-width: 500px;
+            margin: auto;
+            padding: 40px 20px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
 
-    <div class="form-group">
-        <label for="Email">Email</label>
-        <input type="email" class="form-control" id="Email" name="Email" value="@Model.Email" required />
+        .gradient-text {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.8rem;
+            font-weight: bold;
+        }
+
+        /* Stiluri pentru formulare */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+            .form-group label {
+                font-size: 1.2rem;
+                font-weight: bold;
+                color: #4d004d;
+            }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid #ccc;
+            font-size: 1.1rem;
+            margin-top: 8px;
+            box-sizing: border-box;
+        }
+
+            .form-control:focus {
+                border-color: #9900cc;
+                outline: none;
+                box-shadow: 0 0 8px rgba(153, 0, 204, 0.5);
+            }
+
+        /* Buton personalizat */
+        .btn-primary {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            font-size: 1.4rem;
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+        }
+
+            .btn-primary:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+        /* Mesaj de eroare */
+        .alert {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        /* Bara de navigație */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to right, #660066, #4d004d);
+            padding: 15px 0;
+            text-align: center;
+            box-shadow: none;
+            z-index: 1000;
+            font-family: 'Arial', sans-serif;
+        }
+
+            .navbar a {
+                color: white;
+                font-size: 1.6rem;
+                text-decoration: none;
+                font-weight: bold;
+                margin: 0 20px;
+            }
+
+            .navbar .nav-buttons {
+                position: absolute;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+                .navbar .nav-buttons a {
+                    margin-left: 10px;
+                    padding: 12px 30px;
+                    background: linear-gradient(to right, #ff66b2, #9900cc);
+                    color: white;
+                    border-radius: 25px;
+                    text-decoration: none;
+                    font-size: 1.4rem;
+                    font-weight: bold;
+                    transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+                }
+
+                    .navbar .nav-buttons a:hover {
+                        transform: scale(1.05);
+                        background: linear-gradient(to right, #9900cc, #ff66b2);
+                    }
+    </style>
+</head>
+<body>
+
+    <!-- Bara de navigație -->
+    <div class="navbar">
+        <a href="/">Unde Facem Revelionul?</a>
+        <div class="nav-buttons">
+            <a href="/Account/Register">Register</a>
+            <a href="/Account/Login">Login</a>
+        </div>
     </div>
 
-    <div class="form-group">
-        <label for="Password">Password</label>
-        <input type="password" class="form-control" id="Password" name="Password" required />
+    <!-- Formularele de login -->
+    <div class="login-container">
+        <h2 class="gradient-text">Login</h2>
+
+        <form method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label for="Email">Email</label>
+                <input type="email" class="form-control" id="Email" name="Email" value="@Model.Email" required />
+            </div>
+
+            <div class="form-group">
+                <label for="Password">Password</label>
+                <input type="password" class="form-control" id="Password" name="Password" required />
+            </div>
+
+            <button type="submit" class="btn-primary">Login</button>
+        </form>
+
+        @if (ViewData["Message"] != null)
+        {
+            <div class="alert alert-danger">
+                @ViewData["Message"]
+            </div>
+        }
     </div>
 
- 
-
-    <button type="submit" class="btn btn-primary">Login</button>
-</form>
-
-@if (ViewData["Message"] != null)
-{
-    <div class="alert alert-danger">
-        @ViewData["Message"]
-    </div>
-}
+</body>
+</html>

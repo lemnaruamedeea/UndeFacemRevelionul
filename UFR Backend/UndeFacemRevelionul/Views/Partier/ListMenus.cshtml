@@ -1,47 +1,64 @@
 ﻿@using UndeFacemRevelionul.ViewModels
 
-<h2>Select a menu option</h2>
+<!-- Bara de sus stilizată cu fundal gradient -->
+<div class="navbar">
+    <a href="@Url.Action("Index", "Dashboard")" class="navbar-title">Unde Facem Revelionul?</a>
+    <div class="nav-buttons">
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Price</th>
-            <th>Rating</th>
-            <th>Provider</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var menu in Model.Menus)
-        {
+        <form asp-action="Logout" asp-controller="Account" method="post" style="display: inline;">
+            <button type="submit" class="btn-logout">Logout</button>
+        </form>
+    </div>
+</div>
+
+<!-- Secțiunea de text "Selectează o opțiune din meniu" -->
+<div class="menu-selection">
+    <h2>Selectează o opțiune din meniu</h2>
+</div>
+
+<!-- Tabelul cu meniurile -->
+<div class="content-container">
+    <table class="table custom-table">
+        <thead>
             <tr>
-                <td>@menu.Name</td>
-                <td>@menu.Description</td>
-                <td>@menu.Price</td>
-                <td>@menu.Rating</td>
-                <td>@menu.Provider?.User.Name</td>
-                <td>
-                    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#menuModal"
-                            data-id="@menu.Id"
-                            data-name="@menu.Name"
-                            data-price="@menu.Price"
-                            data-description="@menu.Description"
-                            data-rating="@menu.Rating"
-                            data-provider="@menu.Provider?.User.Name">
-                        Detalii
-                    </button>
-                </td>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Rating</th>
+                <th>Provider</th>
+                <th>Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var menu in Model.Menus)
+            {
+                <tr>
+                    <td>@menu.Name</td>
+                    <td>@menu.Description</td>
+                    <td>@menu.Price</td>
+                    <td>@menu.Rating</td>
+                    <td>@menu.Provider?.User.Name</td>
+                    <td>
+                        <button type="button" class="btn btn-info btn-details" data-bs-toggle="modal" data-bs-target="#menuModal"
+                                data-id="@menu.Id"
+                                data-name="@menu.Name"
+                                data-description="@menu.Description"
+                                data-price="@menu.Price"
+                                data-rating="@menu.Rating"
+                                data-provider="@menu.Provider?.User.Name">
+                            Detalii
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 <!-- Modal pentru afișarea detaliilor meniului -->
 <div class="modal fade" id="menuModal" tabindex="-1" aria-labelledby="menuModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content modal-styled">
             <div class="modal-header">
                 <h5 class="modal-title" id="menuModalLabel">Detalii Meniu</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -49,9 +66,7 @@
             <div class="modal-body">
                 <h4 id="menuName"></h4>
                 <p><strong>Description:</strong> <span id="menuDescription"></span></p>
-                <p><strong>Price:</strong> <span id="menuPrice"></span>
-                    
-                </p>
+                <p><strong>Price:</strong> <span id="menuPrice"></span></p>
                 <p><strong>Rating:</strong> <span id="menuRating"></span></p>
                 <p><strong>Provider:</strong> <span id="menuProvider"></span></p>
             </div>
@@ -59,7 +74,7 @@
                 <form asp-action="AddMenuToParty" method="post">
                     <input type="hidden" name="partyId" value="@Model.PartyId" />
                     <input type="hidden" name="menuId" id="menuId" />
-                    <button type="submit" class="btn btn-success">Adaugă la Petrecere</button>
+                    <button type="submit" class="btn btn-add">Adaugă la Petrecere</button>
                 </form>
             </div>
         </div>
@@ -68,23 +83,172 @@
 
 @section Scripts {
     <script>
-        // Script pentru a popula modalul cu detalii despre meniu
-        var menuModal = document.getElementById('menuModal');
-        menuModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var id = button.getAttribute('data-id');
-            var name = button.getAttribute('data-name');
-            var price = button.getAttribute('data-price');
-            var description = button.getAttribute('data-description');
-            var rating = button.getAttribute('data-rating');
-            var provider = button.getAttribute('data-provider');
+        document.addEventListener("DOMContentLoaded", function () {
+            var menuModal = document.getElementById('menuModal');
 
-            document.getElementById('menuName').innerText = name;
-            document.getElementById('menuDescription').innerText = description;
-            document.getElementById('menuPrice').innerText = price;
-            document.getElementById('menuRating').innerText = rating;
-            document.getElementById('menuProvider').innerText = provider;
-            document.getElementById('menuId').value = id;
+            menuModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget; // Butonul care a declanșat modalul
+
+                // Extragem datele din atributele data-*
+                var id = button.getAttribute('data-id');
+                var name = button.getAttribute('data-name');
+                var description = button.getAttribute('data-description');
+                var price = button.getAttribute('data-price');
+                var rating = button.getAttribute('data-rating');
+                var provider = button.getAttribute('data-provider');
+
+                // Le introducem în modal
+                document.getElementById('menuName').innerText = name;
+                document.getElementById('menuDescription').innerText = description;
+                document.getElementById('menuPrice').innerText = price;
+                document.getElementById('menuRating').innerText = rating;
+                document.getElementById('menuProvider').innerText = provider;
+                document.getElementById('menuId').value = id;
+            });
         });
     </script>
 }
+
+<!-- Stiluri personalizate -->
+<style>
+    /* General body and background */
+    body {
+        background: linear-gradient(to right, #ff99cc, #cc66ff, #9900cc);
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center; /* Aliniere pe verticală și orizontală */
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        color: white;
+        flex-direction: column;
+    }
+
+    /* Navbar styles */
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: linear-gradient(to right, #660066, #4d004d);
+        padding: 15px 0;
+        text-align: center;
+        box-shadow: none;
+        z-index: 1000;
+        font-family: 'Arial', sans-serif;
+    }
+
+        .navbar a {
+            color: white;
+            font-size: 1.6rem;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 0 20px;
+        }
+
+        .navbar .nav-buttons {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+            .navbar .nav-buttons a {
+                margin-left: 10px;
+                padding: 12px 30px;
+                background: linear-gradient(to right, #ff66b2, #9900cc);
+                color: white;
+                border-radius: 25px;
+                text-decoration: none;
+                font-size: 1.4rem;
+                font-weight: bold;
+                transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            }
+
+                .navbar .nav-buttons a:hover {
+                    transform: scale(1.05);
+                    background: linear-gradient(to right, #9900cc, #ff66b2);
+                }
+
+    /* Content section (just below navbar) */
+    .menu-selection {
+        margin-top: 100px; /* To avoid overlapping the navbar */
+        text-align: center;
+        width: 100%;
+    }
+
+    /* Tabelul personalizat */
+    .custom-table th, .custom-table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    /* Modal personalizat */
+    .modal-styled {
+        position: relative;
+        z-index: 1050; /* Asigură-te că este mai mare decât orice alt element din pagină */
+        border-radius: 8px;
+        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-body {
+        color: #4d004d; /* Setează o culoare mai închisă pentru textul din modal */
+    }
+
+    .modal-header h5 {
+        color: #9900cc; /* Culoare diferită pentru titlul modalului */
+    }
+
+    /* Button styles */
+    .btn-primary {
+        background: linear-gradient(to right, #ff66b2, #9900cc);
+        color: white;
+        padding: 12px 30px;
+        font-size: 1.4rem;
+        border-radius: 25px;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+        display: inline-block;
+        margin-top: 20px;
+    }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            background: linear-gradient(to right, #9900cc, #ff66b2);
+        }
+
+    .btn-secondary {
+        background: #4d004d;
+        color: white;
+        padding: 12px 30px;
+        font-size: 1.4rem;
+        border-radius: 25px;
+        text-decoration: none;
+        transition: transform 0.3s ease-in-out;
+    }
+
+        .btn-secondary:hover {
+            transform: scale(1.05);
+            background: #9900cc;
+        }
+
+    .btn-logout {
+        background: linear-gradient(to right, #ff66b2, #9900cc);
+        color: white;
+        padding: 12px 30px;
+        font-size: 1.4rem;
+        border-radius: 25px;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+        display: inline-block;
+        margin-top: 20px;
+    }
+
+        .btn-logout:hover {
+            transform: scale(1.05);
+            background: linear-gradient(to right, #9900cc, #ff66b2);
+        }
+</style>

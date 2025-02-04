@@ -1,15 +1,221 @@
 ﻿@model UndeFacemRevelionul.Models.PartyModel
 
-<h2>Delete party</h2>
+@{
+    ViewData["Title"] = "Delete Party";
+    var userName = User.Identity.Name;
+}
 
-<p>Are you sure you want to delete this user?</p>
-<ul>
-    <li><strong>Name:</strong> @Model.Name</li>
-    <li><strong>Date:</strong> @Model.Date.ToString("d")</li>
-</ul>
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        /* Stilizare generală */
+        body {
+            background: linear-gradient(to right, #ff99cc, #cc66ff, #9900cc);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            font-family: Arial, sans-serif;
+            flex-direction: column;
+            padding-top: 80px;
+        }
 
-<form asp-action="DeletePartyConfirmed" method="post">
-    <input type="hidden" asp-for="Id" />
-    <button type="submit" class="btn btn-danger">Delete</button>
-    <a href="@Url.Action("PartyDetails", "Partier", new { id = Model.Id })" class="btn btn-secondary">Cancel</a>
-</form>
+        /* Butoane personalizate pentru delete și cancel */
+        .btn-primary {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            font-size: 1.4rem;
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            text-decoration: none; /* Elimină sublinierea */
+        }
+
+            .btn-primary:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+        /* Buton pentru cancel cu o nuanță diferită */
+        .btn-secondary {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            font-size: 1.4rem;
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+        }
+
+            .btn-secondary:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+        /* Bara de navigație */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to right, #660066, #4d004d);
+            padding: 15px 0;
+            text-align: center;
+            box-shadow: none;
+            z-index: 1000;
+            font-family: 'Arial', sans-serif;
+        }
+
+            .navbar a {
+                color: white;
+                font-size: 1.6rem;
+                text-decoration: none;
+                font-weight: bold;
+                margin: 0 20px;
+            }
+
+        .nav-buttons {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+            .nav-buttons a, .nav-buttons button {
+                padding: 12px 25px;
+                background: linear-gradient(to right, #ff66b2, #9900cc);
+                color: white;
+                border-radius: 25px;
+                font-size: 1.2rem;
+                font-weight: bold;
+                border: none;
+                cursor: pointer;
+                transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+                text-decoration: none;
+            }
+
+                .nav-buttons a:hover, .nav-buttons button:hover {
+                    transform: scale(1.05);
+                    background: linear-gradient(to right, #9900cc, #ff66b2);
+                }
+
+        /* Container principal */
+        .dashboard-container {
+            max-width: 600px;
+            margin: auto;
+            padding: 40px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+            .dashboard-container h2 {
+                font-size: 2.2rem;
+                background: linear-gradient(to right, #ff66b2, #9900cc);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                margin-bottom: 20px;
+            }
+
+            .dashboard-container p {
+                font-size: 1.2rem;
+                color: #660066;
+                margin-bottom: 20px;
+            }
+
+        .party-info {
+            text-align: left;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            color: #4d004d;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+            .party-info li {
+                list-style: none;
+                padding: 5px 0;
+            }
+
+        /* Butoane */
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            border: none;
+        }
+
+        .btn-delete {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+        }
+
+            .btn-delete:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+        .btn-cancel {
+            background: linear-gradient(to right, #999999, #666666);
+            color: white;
+            margin-left: 10px;
+        }
+
+            .btn-cancel:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #666666, #999999);
+            }
+
+    </style>
+</head>
+<body>
+
+    <!-- Bara de navigație -->
+    <div class="navbar">
+        <a href="@Url.Action("Index", "Dashboard")" class="navbar-title">Unde Facem Revelionul?</a>
+        <div class="nav-buttons">
+            <a href="@Url.Action("Index", "Dashboard")">Back to Dashboard</a>
+            <form asp-action="Logout" asp-controller="Account" method="post">
+                <button type="submit">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Conținutul paginii -->
+    <div class="dashboard-container">
+        <h2>Delete Party</h2>
+        <p>Are you sure you want to delete this party?</p>
+
+        <ul class="party-info">
+            <li><strong>Name:</strong> @Model.Name</li>
+            <li><strong>Date:</strong> @Model.Date.ToString("dd/MM/yyyy")</li>
+        </ul>
+
+        <form asp-action="DeletePartyConfirmed" method="post" onsubmit="showLoading()">
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger btn-primary">Delete</button>
+            <a href="@Url.Action("PartyDetails", "Partier", new { id = Model.Id })" class="btn btn-secondary btn-primary">Cancel</a>
+        </form>
+
+    </div>
+
+</body>
+</html>

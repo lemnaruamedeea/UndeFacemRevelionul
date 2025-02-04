@@ -1,20 +1,187 @@
 ﻿@model UndeFacemRevelionul.ViewModels.CreatePartyViewModel
-<h1>Create a new party</h1>
 
-<form method="post" asp-action="CreateParty">
-    <div class="form-group">
-        <label for="Name">Name</label>
-        <input type="text" class="form-control" id="Name" name="Name" value="@Model.Name" required />
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create a new party</title>
+    <style>
+        /* Fundal gradient pentru pagină */
+        body {
+            background: linear-gradient(to right, #ff99cc, #cc66ff, #9900cc);
+            min-height: 100vh; /* Asigură că body-ul acoperă întreaga înălțime */
+            display: flex;
+            justify-content: center; /* Centrează formularul pe orizontală */
+            align-items: center; /* Centrează formularul pe verticală */
+            font-family: Arial, sans-serif;
+            flex-direction: column;
+            margin: 0; /* Elimină marginile implicite */
+        }
+
+        /* Bara de navigație */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to right, #660066, #4d004d);
+            padding: 15px 0;
+            text-align: center;
+            z-index: 1000;
+            font-family: 'Arial', sans-serif;
+        }
+
+            .navbar a {
+                color: white;
+                font-size: 1.6rem;
+                text-decoration: none;
+                font-weight: bold;
+                margin: 0 20px;
+            }
+
+            .navbar .nav-buttons {
+                position: absolute;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+                .navbar .nav-buttons a {
+                    margin-left: 10px;
+                    padding: 12px 30px;
+                    background: linear-gradient(to right, #ff66b2, #9900cc);
+                    color: white;
+                    border-radius: 25px;
+                    font-size: 1.4rem;
+                    font-weight: bold;
+                    transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+                }
+
+                    .navbar .nav-buttons a:hover {
+                        transform: scale(1.05);
+                        background: linear-gradient(to right, #9900cc, #ff66b2);
+                    }
+
+        /* Formular pentru crearea petrecerii */
+        .form-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 600px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            color: #333;
+            width: 100%;
+            text-align: left;
+        }
+
+            .form-container h1 {
+                font-size: 2.5rem;
+                background: linear-gradient(to right, #ff66b2, #9900cc);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                margin-bottom: 20px;
+            }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            font-size: 1.2rem;
+            color: #660066;
+            font-weight: bold;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border-radius: 25px;
+            border: 2px solid #ff66b2;
+            font-size: 1rem;
+            transition: all 0.3s ease-in-out;
+        }
+
+            .form-control:focus {
+                border-color: #9900cc;
+                outline: none;
+                box-shadow: 0 0 8px rgba(153, 0, 204, 0.5);
+            }
+
+        .btn-primary {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            font-size: 1.4rem;
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            width: 100%;
+        }
+
+            .btn-primary:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+        .form-container .back-button {
+            background: transparent;
+            color: #9900cc;
+            font-size: 1.4rem;
+            padding: 12px;
+            border-radius: 25px;
+            border: 2px solid #9900cc;
+            transition: all 0.3s ease-in-out;
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+            .form-container .back-button:hover {
+                transform: scale(1.05);
+                background: #9900cc;
+                color: white;
+            }
+    </style>
+</head>
+<body>
+
+    <!-- Bara de navigație -->
+    <div class="navbar">
+        <a href="/" class="navbar-title">Unde Facem Revelionul?</a>
+        <div class="nav-buttons">
+            <a href="@Url.Action("Dashboard", "Partier")" class="btn-primary">Back to Dashboard</a>
+            <form asp-action="Logout" asp-controller="Account" method="post" style="display:inline;">
+                <button type="submit" class="btn-primary">Logout</button>
+            </form>
+        </div>
     </div>
-    <div class="form-group">
-        <label for="Date">Date</label>
-        <input type="date" class="form-control" id="Date" name="Date" value="@Model.Date.ToString("yyyy-MM-dd")" required />
+
+    <!-- Formular de creare petrecere -->
+    <div class="form-container">
+        <h1>Create a new party</h1>
+
+        <form method="post" asp-action="CreateParty">
+            <div class="form-group">
+                <label for="Name">Name</label>
+                <input type="text" class="form-control" id="Name" name="Name" value="@Model.Name" required />
+            </div>
+            <div class="form-group">
+                <label for="Date">Date</label>
+                <input type="date" class="form-control" id="Date" name="Date" value="@Model.Date.ToString("yyyy-MM-dd")" required />
+            </div>
+            <div class="form-group">
+                <label for="TotalBudget">Total budget</label>
+                <input type="number" class="form-control" id="TotalBudget" name="TotalBudget" value="@Model.TotalBudget" required />
+            </div>
+
+            <button type="submit" class="btn-primary mt-3">Create</button>
+        </form>
+
+        <a href="@Url.Action("Dashboard", "Partier")" class="back-button">Back to Dashboard</a>
     </div>
-    <div class="form-group">
-        <label for="TotalBudget">Total budget</label>
-        <input type="number" class="form-control" id="TotalBudget" name="TotalBudget" value="@Model.TotalBudget" required />
-    </div>
-    
-    </div>
-    <button type="submit" class="btn btn-success mt-3">Create</button>
-</form>
+
+</body>
+</html>

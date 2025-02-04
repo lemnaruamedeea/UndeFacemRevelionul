@@ -1,22 +1,158 @@
 ﻿@model UndeFacemRevelionul.ViewModels.EditMenuViewModel
 
-<h2>Edit Menu</h2>
+@{
+    ViewData["Title"] = "Edit Menu";
+}
 
-<form asp-action="EditMenu" method="post">
-    <div>
-        <label for="Name">Menu Name</label>
-        <input type="text" id="Name" name="Name" value="@Model.Name" />
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            background: linear-gradient(to right, #ff99cc, #cc66ff, #9900cc);
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            color: white;
+            flex-direction: column;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to right, #660066, #4d004d);
+            padding: 25px 0;
+            text-align: center;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+            .navbar a {
+                color: white;
+                font-size: 1.6rem;
+                text-decoration: none;
+                font-weight: bold;
+            }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            margin-top: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #9900cc;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+            .form-group label {
+                font-size: 1.1rem;
+                font-weight: bold;
+                color: #4d004d;
+                display: block;
+                margin-bottom: 5px;
+            }
+
+            .form-group input {
+                width: 100%;
+                padding: 10px;
+                font-size: 1rem;
+                border-radius: 10px;
+                border: 2px solid #cc66ff;
+                background-color: #f9f9f9;
+                color: #4d004d;
+                outline: none;
+                transition: all 0.3s ease;
+            }
+
+                .form-group input:focus {
+                    border-color: #9900cc;
+                    background-color: #ffffff;
+                }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 1.4rem;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+        }
+
+            .btn-primary:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+        .btn-secondary {
+            background: gray;
+            color: white;
+            margin-left: 10px;
+        }
+
+            .btn-secondary:hover {
+                transform: scale(1.05);
+                background: darkgray;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="@Url.Action("Index", "Home")">Unde Facem Revelionul?</a>
     </div>
 
-    <div>
-        <label for="Description">Description</label>
-        <input type="text" id="Description" name="Description" value="@Model.Description" />
+    <div class="form-container">
+        <h1>Edit Menu</h1>
+        <form asp-action="EditMenu" method="post">
+            <div class="form-group">
+                <label for="Name">Menu Name</label>
+                <input type="text" id="Name" name="Name" value="@Model.Name" required />
+            </div>
+
+            <div class="form-group">
+                <label for="Description">Description</label>
+                <input type="text" id="Description" name="Description" value="@Model.Description" required />
+            </div>
+
+            <div class="form-group">
+                <label for="Price">Price</label>
+                <input type="number" id="Price" name="Price" value="@Model.Price" required />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a href="@Url.Action("Dashboard", "Provider")" class="btn btn-secondary">Cancel</a>
+        </form>
     </div>
 
-    <div>
-        <label for="Price">Price</label>
-        <input type="text" id="Price" name="Price" value="@Model.Price" />
-    </div>
-
-    <button type="submit">Save</button>
-</form>
+</body>
+</html>

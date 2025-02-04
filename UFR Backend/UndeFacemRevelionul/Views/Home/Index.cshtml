@@ -2,21 +2,161 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4 gradient-text">Welcome to your New Year's experience!</h1>
-    <p>Suntem aici pentru a transforma organizarea petrecerii de Revelion într-o experiență unică, distractivă și colaborativă. Aplicația noastră este creată special pentru a ajuta grupurile de prieteni să planifice fiecare detaliu al unei seri memorabile.</a>.</p>
-    <p>
-        Unde facem Revelionul?” aduce la un loc toate uneltele de care aveți nevoie pentru a sărbători în stil mare.
-        Împreună, planificăm momente care vor deveni amintiri de neuitat! 🥂
-    </p>
-</div>
-
 <style>
+    /* Bara de navigație - mai închisă, text centrat și font adaptat */
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: linear-gradient(to right, #660066, #4d004d);
+        padding: 15px 0;
+        text-align: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        font-family: 'Arial', sans-serif; /* Font similar cu cel folosit pentru restul paginii */
+    }
+
+        .navbar a {
+            color: white;
+            font-size: 1.6rem;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 0 20px; /* Adăugat margină pentru distanțare între butoane */
+        }
+
+        .navbar .nav-buttons {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+            /* Butoane Login și Register, stilizate identic cu butonul "Începe acum!" */
+            .navbar .nav-buttons a {
+                margin-left: 10px;
+                padding: 12px 30px;
+                background: linear-gradient(to right, #ff66b2, #9900cc);
+                color: white;
+                border-radius: 25px;
+                text-decoration: none;
+                font-size: 1.4rem; /* Mărimea textului ajustată la fel ca "Începe acum!" */
+                font-weight: bold; /* Grosimea textului ajustată la fel ca "Începe acum!" */
+                transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            }
+
+                .navbar .nav-buttons a:hover {
+                    transform: scale(1.05);
+                    background: linear-gradient(to right, #9900cc, #ff66b2);
+                }
+
+    /* Stil pentru titlu cu gradient */
     .gradient-text {
-        background: linear-gradient(to right, #4b0082, #ff007f);
+        background: linear-gradient(to right, #ff66b2, #9900cc);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        font-size: 2.5rem; 
+        font-size: 2.8rem;
         font-weight: bold;
     }
+
+    /* Container central */
+    .home-container {
+        max-width: 800px;
+        margin: auto;
+        padding: 80px 20px 50px; /* Adăugat padding top pentru a nu fi acoperit de navbar */
+        text-align: center;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Buton stilizat */
+    .btn-custom {
+        background: linear-gradient(to right, #ff66b2, #9900cc);
+        color: white;
+        font-size: 1.4rem; /* Mărimea textului ajustată pentru a fi uniform cu restul butoanelor */
+        padding: 12px 30px;
+        border-radius: 25px;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+    }
+
+        .btn-custom:hover {
+            transform: scale(1.05);
+            background: linear-gradient(to right, #9900cc, #ff66b2);
+        }
+
+    /* Fundal roz-mov */
+    body {
+        background: linear-gradient(to right, #ff99cc, #cc66ff, #9900cc);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: Arial, sans-serif;
+        flex-direction: column;
+    }
+
+    /* Privacy Section direct pe fundal 
+    .privacy-section {
+        text-align: center;
+        padding: 50px 20px;
+        color: white;
+        font-size: 1.1rem;
+        margin-top: 40px;
+    }
+
+        .privacy-section h2 {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            }*/
+
+    /* Footer text fara background alb */
+    .footer-text {
+        text-align: center;
+        font-size: 1rem;
+        color: white;
+        padding: 10px 20px;
+        background: none; /* Elimină fundalul alb */
+        margin-top: 40px;
+    }
 </style>
+
+<!-- Bara de navigație -->
+<div class="navbar">
+    <a href="/">Unde Facem Revelionul?</a>
+    <div class="nav-buttons">
+        <a href="/Account/Register">Register</a>
+        <a href="/Account/Login">Login</a>
+    </div>
+</div>
+
+<!-- Conținut principal -->
+<div class="home-container">
+    <h1 class="gradient-text">Welcome to your New Year's experience!</h1>
+    <p>
+        Suntem aici pentru a transforma organizarea petrecerii de Revelion într-o experiență unică,
+        distractivă și colaborativă. Aplicația noastră este creată special pentru a ajuta grupurile de prieteni
+        să planifice fiecare detaliu al unei seri memorabile.
+    </p>
+    <p>
+        <strong>"Unde facem Revelionul?"</strong> aduce la un loc toate uneltele de care aveți nevoie pentru a
+        sărbători în stil mare. Împreună, planificăm momente care vor deveni amintiri de neuitat! 🥂
+    </p>
+    <a href="/Account/Register" class="btn btn-custom">Începe acum!</a>
+</div>
+
+<!-- Footer 
+<div class="footer-text">
+    © 2024 - UndeFacemRevelionul - Privacy
+</div>
+-->
+
+<!-- Privacy Section direct pe fundal 
+<div class="privacy-section">
+    <h2>Privacy & Terms</h2>
+    <p>Protejăm datele tale și respectăm intimitatea utilizatorilor. Citește politica noastră de confidențialitate.</p>
+</div>
+-->
