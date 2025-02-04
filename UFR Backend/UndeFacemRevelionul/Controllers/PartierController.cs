@@ -9,7 +9,9 @@ using UndeFacemRevelionul.ViewModels;
 using System.Linq;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using System.Threading;
+
 
 namespace UndeFacemRevelionul.Controllers;
 
@@ -22,6 +24,31 @@ public class PartierController : Controller
     {
         _context = context;
         _logger = logger;
+    }
+
+    // Metoda AddPoints ar trebui să fie definită ca un POST request:
+    [HttpPost]
+    public IActionResult AddPoints(int points)
+    {
+        var currentUserId = GetCurrentUserId();
+
+        // Găsim partier-ul asociat utilizatorului logat
+        var partier = _context.Partiers.FirstOrDefault(p => p.UserId == currentUserId);
+
+        if (partier == null)
+        {
+            TempData["ErrorMessage"] = "Nu există un partier asociat utilizatorului logat.";
+            return RedirectToAction("Index", "Home");
+        }
+
+        // Actualizăm punctele
+        partier.Points += points;
+
+        // Salvăm modificările în baza de date
+        _context.SaveChanges();
+
+        TempData["SuccessMessage"] = $"Ai câștigat {points} puncte!";
+        return RedirectToAction("Dashboard");
     }
 
     [HttpGet]
@@ -55,6 +82,87 @@ public class PartierController : Controller
 
         return View();
     }
+
+    [Authorize]
+    public IActionResult WheelOfFortune()
+    {
+        return View();
+    }
+
+
+    //// GET: Wheel of Fortune
+    //[HttpGet]
+    //public IActionResult WheelOfFortune()
+    //{
+    //    var currentUserId = GetCurrentUserId();
+
+    //    // Găsim partier-ul asociat utilizatorului logat
+    //    var partier = _context.Partiers.FirstOrDefault(p => p.UserId == currentUserId);
+
+    //    if (partier == null)
+    //    {
+    //        TempData["ErrorMessage"] = "Nu există un partier asociat utilizatorului logat.";
+    //        return RedirectToAction("Index", "Home");
+    //    }
+
+    //    // Elimini verificarea pentru 24 de ore
+    //    // Acum nu mai există restricții de rotație zilnică
+    //    // Logica pentru a face un spin (poți să adaugi puncte aici)
+    //    Random random = new Random();
+    //    int spunPoints = random.Next(10, 101); // Exemplu: câștigă între 10 și 100 puncte
+    //    partier.Points += spunPoints;
+
+    //    partier.LastSpinDate = DateTime.Now; // Actualizează data ultimului spin
+
+    //    _context.SaveChanges(); // Salvează modificările în baza de date
+
+    //    TempData["SuccessMessage"] = $"Ai câștigat {spunPoints} puncte! Total puncte: {partier.Points}";
+
+    //    return RedirectToAction("Dashboard");
+    //}
+
+    //[HttpPost]
+    //public IActionResult SpinWheel()
+    //{
+    //    var currentUserId = GetCurrentUserId();  // Obține ID-ul utilizatorului logat
+
+    //    // Găsim partier-ul asociat utilizatorului logat
+    //    var partier = _context.Partiers.FirstOrDefault(p => p.UserId == currentUserId);
+
+    //    if (partier == null)
+    //    {
+    //        TempData["ErrorMessage"] = "Nu există un partier asociat utilizatorului logat.";
+    //        return RedirectToAction("Index", "Home");
+    //    }
+
+    //    // Elimini verificarea pentru data ultimei rotiri
+    //    // Nu mai există restricții, astfel încât nu mai verificăm dacă utilizatorul a rotit deja roata azi
+
+    //    // Actualizăm data ultimei rotiri
+    //    partier.LastSpinDate = DateTime.Now;
+
+    //    // Logica pentru calculul premiului și punctelor câștigate
+    //    var reward = GetWheelReward(); // O funcție care întoarce punctele câștigate
+    //    partier.Points += reward;
+
+    //    // Salvează modificările în baza de date
+    //    _context.SaveChanges();
+
+    //    // Mesaj de succes
+    //    TempData["SuccessMessage"] = $"Ai câștigat {reward} puncte!";
+
+    //    // Redirecționăm utilizatorul înapoi la dashboard
+    //    return RedirectToAction("Dashboard");
+    //}
+
+    //private int GetWheelReward()
+    //{
+    //    // Logica pentru determinarea premiului roții
+    //    // De exemplu, generăm un număr aleator pentru puncte
+    //    var random = new Random();
+    //    return random.Next(10, 101); // Puncte între 10 și 100
+    //}
+
 
 
     // GET: CreateParty
@@ -501,6 +609,8 @@ public class PartierController : Controller
         {
             return NotFound("Party not found.");
         }
+
+        
 
         // Calculăm totalul punctelor
         int totalPoints = party.PartyUsers?.Sum(pu => pu.Partier.Points) ?? 0;

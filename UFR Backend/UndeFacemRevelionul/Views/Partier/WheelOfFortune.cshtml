@@ -1,0 +1,339 @@
+﻿@{
+    ViewData["Title"] = "Roata Norocului";
+}
+@using System.Security.Claims
+
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roata Norocului</title>
+    <style>
+        /* General body and background */
+        body {
+            background: linear-gradient(to right, #ff99cc, #cc66ff, #9900cc);
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center; /* Aliniere pe verticală și orizontală */
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            color: white;
+            flex-direction: column;
+        }
+
+        /* Navbar styles */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to right, #660066, #4d004d);
+            padding: 15px 0;
+            text-align: center;
+            box-shadow: none;
+            z-index: 1000;
+            font-family: 'Arial', sans-serif;
+        }
+
+            .navbar a {
+                color: white;
+                font-size: 1.6rem;
+                text-decoration: none;
+                font-weight: bold;
+                margin: 0 20px;
+            }
+
+            .navbar .nav-buttons {
+                position: absolute;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+                .navbar .nav-buttons a,
+                .navbar .nav-buttons form button {
+                    margin-left: 10px;
+                    padding: 12px 30px;
+                    background: linear-gradient(to right, #ff66b2, #9900cc);
+                    color: white;
+                    border-radius: 25px;
+                    text-decoration: none;
+                    font-size: 1.4rem;
+                    font-weight: bold;
+                    transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+                }
+
+                    .navbar .nav-buttons a:hover,
+                    .navbar .nav-buttons form button:hover {
+                        transform: scale(1.05);
+                        background: linear-gradient(to right, #9900cc, #ff66b2);
+                    }
+
+        /* Wheel of fortune styles */
+        :where(.ui-wheel-of-fortune) {
+            --_items: 12;
+            all: unset;
+            aspect-ratio: 1 / 1;
+            container-type: inline-size;
+            direction: ltr;
+            display: grid;
+            position: relative;
+            width: 100%;
+        }
+
+            :where(.ui-wheel-of-fortune)::after {
+                aspect-ratio: 1 / cos(30deg);
+                background-color: crimson;
+                clip-path: polygon(50% 100%,100% 0,0 0);
+                content: "";
+                height: 4cqi;
+                position: absolute;
+                place-self: start center;
+                scale: 1.4;
+            }
+
+            :where(.ui-wheel-of-fortune) > * {
+                position: absolute;
+            }
+
+        .ui-wheel-of-fortune button {
+            aspect-ratio: 1 / 1;
+            background: hsla(0, 0%, 100%, .8);
+            border: 0;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 5cqi;
+            place-self: center;
+            width: 20cqi;
+        }
+
+        .ui-wheel-of-fortune ul {
+            all: unset;
+            clip-path: inset(0 0 0 0 round 50%);
+            display: grid;
+            inset: 0;
+            place-content: center start;
+        }
+
+        .ui-wheel-of-fortune li {
+            align-content: center;
+            aspect-ratio: 1 / calc(2 * tan(180deg / var(--_items)));
+            background: hsl(calc(360deg / var(--_items) * calc(var(--_idx))), 100%, 75%);
+            clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+            display: grid;
+            font-size: 5cqi;
+            grid-area: 1 / -1;
+            padding-left: 1ch;
+            rotate: calc(360deg / var(--_items) * calc(var(--_idx) - 1));
+            transform-origin: center right;
+            user-select: none;
+            width: 50cqi;
+        }
+
+            .ui-wheel-of-fortune li:nth-of-type(1) {
+                --_idx: 1;
+            }
+
+            .ui-wheel-of-fortune li:nth-of-type(2) {
+                --_idx: 2;
+            }
+
+            .ui-wheel-of-fortune li:nth-of-type(3) {
+                --_idx: 3;
+            }
+
+            .ui-wheel-of-fortune li:nth-of-type(4) {
+                --_idx: 4;
+            }
+
+            .ui-wheel-of-fortune li:nth-of-type(5) {
+                --_idx: 5;
+            }
+
+            .ui-wheel-of-fortune li:nth-of-type(6) {
+                --_idx: 6;
+            }
+
+            .ui-wheel-of-fortune li:nth-of-type(7) {
+                --_idx: 7;
+            }
+
+            .ui-wheel-of-fortune li:nth-of-type(8) {
+                --_idx: 8;
+            }
+
+            .ui-wheel-of-fortune li:nth-of-type(9) {
+                --_idx: 9;
+            }
+
+            .ui-wheel-of-fortune li:nth-of-type(10) {
+                --_idx: 10;
+            }
+
+            .ui-wheel-of-fortune li:nth-of-type(11) {
+                --_idx: 11;
+            }
+
+            .ui-wheel-of-fortune li:nth-of-type(12) {
+                --_idx: 12;
+            }
+
+        /* Additional styles */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, sans-serif;
+            padding: 5cqi;
+        }
+
+        /* Button styles */
+        .btn-primary {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            padding: 12px 30px;
+            font-size: 1.4rem;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+            .btn-primary:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+        .btn-secondary {
+            background: #4d004d;
+            color: white;
+            padding: 12px 30px;
+            font-size: 1.4rem;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: transform 0.3s ease-in-out;
+        }
+
+            .btn-secondary:hover {
+                transform: scale(1.05);
+                background: #9900cc;
+            }
+
+        .btn-logout {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            padding: 12px 30px;
+            font-size: 1.4rem;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+            .btn-logout:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+        /* Success and Error messages */
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .alert-success {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .alert-danger {
+            background-color: #f44336;
+            color: white;
+        }
+
+
+    </style>
+</head>
+<!--
+<body data-user-id="@User.FindFirstValue(ClaimTypes.NameIdentifier)">-->
+<body>
+
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <a href="@Url.Action("Index", "Dashboard")" class="navbar-title">Unde Facem Revelionul?</a>
+        <div class="nav-buttons">
+            <a href="@Url.Action("Dashboard", "Partier")" class="btn-secondary">Back to Dashboard</a>
+
+            <form asp-action="Logout" asp-controller="Account" method="post" style="display: inline;">
+                <button type="submit" class="btn-logout">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <fieldset class="ui-wheel-of-fortune">
+        <ul>
+            <li>10 points</li>
+            <li>20 points</li>
+            <li>5 points</li>
+            <li>Try again</li>
+            <li>10 points</li>
+            <li>5 points</li>
+            <li>10 points</li>
+            <li>20 points</li>
+            <li>5 points</li>
+            <li>10 points</li>
+            <li>50 points</li>
+            <li>20 points</li>
+        </ul>
+        <button type="button">SPIN</button>
+    </fieldset>
+
+    <script>
+        function wheelOfFortune(selector) {
+            const node = document.querySelector(selector);
+            if (!node) return;
+
+            const spin = node.querySelector('button');
+            const wheel = node.querySelector('ul');
+            let animation;
+            let previousEndDegree = 0;
+
+            spin.addEventListener('click', () => {
+                if (animation) {
+                    animation.cancel(); // Reset the animation if it already exists
+                }
+
+                const randomAdditionalDegrees = Math.random() * 360 + 1800;
+                const newEndDegree = previousEndDegree + randomAdditionalDegrees;
+
+                animation = wheel.animate([
+                    { transform: `rotate(${previousEndDegree}deg)` },
+                    { transform: `rotate(${newEndDegree}deg)` }
+                ], {
+                    duration: 4000,
+                    direction: 'normal',
+                    easing: 'cubic-bezier(0.440, -0.205, 0.000, 1.130)',
+                    fill: 'forwards',
+                    iterations: 1
+                });
+
+                previousEndDegree = newEndDegree;
+            });
+        }
+
+        // Usage
+        wheelOfFortune('.ui-wheel-of-fortune');
+    </script>
+</body>
+</html>
