@@ -6,7 +6,9 @@ using System.Security.Claims;
 using UndeFacemRevelionul.ContextModels;
 using UndeFacemRevelionul.Models;
 using UndeFacemRevelionul.ViewModels;
-using System.Linq; 
+using System.Linq;
+using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace UndeFacemRevelionul.Controllers;
 
@@ -154,7 +156,7 @@ public class PartierController : Controller
         var party = _context.Parties
             .Include(p => p.Tasks)
             .Include(p => p.FoodMenu) // Încarcă meniul asociat
-            .Include(p => p.Location) // Încarcă meniul asociat
+            .Include(p => p.Location) // Încarcă locația asociată
             .Include(p => p.PartyUsers)  // Include utilizatorii petrecerii
             .ThenInclude(pu => pu.Partier)  // Include informațiile despre partieri
             .ThenInclude(pa => pa.User)   // Încarcă detaliile utilizatorului
@@ -172,6 +174,32 @@ public class PartierController : Controller
             TempData["ErrorMessage"] = "Partierul nu a fost găsit.";
             return RedirectToAction("Dashboard", "Partier");
         }
+
+        // Include playlist cu melodii
+        var playlist = _context.Playlists
+            .Include(pl => pl.PlaylistSongs)
+                .ThenInclude(ps => ps.Song) // Include detaliile melodiei
+            .FirstOrDefault(pl => pl.PartyId == id);
+
+        if (playlist != null && playlist.PlaylistSongs != null)
+        {
+            Debug.WriteLine($"Number of songs in playlist: {playlist.PlaylistSongs.Count}");
+
+            var playlistSongUrls = playlist.PlaylistSongs
+                .Where(ps => !string.IsNullOrEmpty(ps.Song.SongPath)) // Verificăm ca SongPath să nu fie null
+                .Select(ps => ps.Song.SongPath)
+                .ToList();
+
+            ViewBag.SerializedPlaylistSongs = JsonConvert.SerializeObject(playlistSongUrls);
+        }
+        else
+        {
+            ViewBag.SerializedPlaylistSongs = "[]"; // Dacă nu sunt melodii, trimitem o listă goală
+        }
+
+
+        ViewBag.Playlist = playlist;
+
 
         var assignedTasks = party.Tasks.Where(t => t.PartierId == currentPartier.Id).ToList();
 

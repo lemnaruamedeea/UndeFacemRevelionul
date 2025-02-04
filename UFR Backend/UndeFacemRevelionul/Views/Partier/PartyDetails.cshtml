@@ -8,7 +8,7 @@
 <p>Menu: @Model.FoodMenu?.Name</p>
 <p>Party Points: @Model.TotalPoints</p>
 
-<h3>Members</h3>
+<h2>Members</h2>
 <table class="table">
     <thead>
         <tr>
@@ -96,3 +96,166 @@ else
 <!-- Buton pentru a naviga la PartyTasks -->
 <a asp-action="AddTask" asp-route-partyId="@Model.Id" class="btn btn-primary">Add Task</a>
 
+<h2>Playlist</h2>
+
+@if (ViewBag.Playlist != null)
+{
+    <h4>@ViewBag.Playlist.Name</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Song</th>
+                <th>Artist</th>
+                <th>Added By</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var playlistSong in ViewBag.Playlist.PlaylistSongs)
+            {
+                <tr>
+                    <td>
+                        <a href="@playlistSong.Song.SongPath" target="_blank">
+                            @playlistSong.Song.Title
+                        </a>
+                    </td>
+                    <td>@playlistSong.Song.Artist</td>
+                    <td>@(playlistSong.Partier?.User?.Name ?? "Unknown")</td>
+                    <td>
+                        <form method="post" asp-action="RemoveSongFromPlaylist" asp-controller="Playlist" style="display:inline">
+                            <input type="hidden" name="playlistId" value="@ViewBag.Playlist.Id" />
+                            <input type="hidden" name="songId" value="@playlistSong.SongId" />
+                            <button type="submit" class="btn btn-danger">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- YouTube Player Section -->
+    <div id="youtube-player-container">
+        <div id="player"></div>
+        <div style="margin-top: 10px;">
+            <button id="prev-song" class="btn btn-secondary">Previous</button>
+            <button id="next-song" class="btn btn-secondary">Next</button>
+        </div>
+        <p id="current-song-title"></p>
+    </div>
+
+    <form method="post" asp-action="AddSongToPlaylist" asp-controller="Playlist">
+        <input type="hidden" name="playlistId" value="@ViewBag.Playlist.Id" />
+        <label for="songTitle">Song Title:</label>
+        <input type="text" id="songTitle" name="songTitle" required />
+        <label for="artistName">Artist:</label>
+        <input type="text" id="artistName" name="artistName" required />
+        <button type="submit" class="btn btn-success">Add Song</button>
+    </form>
+}
+else
+{
+    <form method="post" asp-action="CreatePlaylist" asp-controller="Playlist">
+        <input type="hidden" name="partyId" value="@Model.Id" />
+        <button type="submit" class="btn btn-success">Create Playlist</button>
+    </form>
+}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Playlist primit din ViewBag
+        const playlistSongs = JSON.parse('@Html.Raw(ViewBag.SerializedPlaylistSongs)');
+        console.log("Playlist Songs:", playlistSongs);
+
+        let currentSongIndex = 0;
+        let player;
+
+        // Funcția care extrage Video ID din URL
+        function extractYouTubeId(url) {
+            const match = url.match(/(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&]+)/);
+            return match ? match[1] : null;
+        }
+
+        // Încarcă o melodie
+        function loadSong(index) {
+            if (index >= 0 && index < playlistSongs.length) {
+                currentSongIndex = index;
+                const videoId = extractYouTubeId(playlistSongs[currentSongIndex]);
+                console.log("Loading song with Video ID:", videoId);
+
+                if (videoId) {
+                    player.loadVideoById(videoId);
+                    player.addEventListener("onStateChange", function (event) {
+                        if (event.data === YT.PlayerState.PLAYING) {
+                            const videoData = player.getVideoData();
+                            document.getElementById("current-song-title").textContent =
+                                `Now Playing: ${videoData.title}`;
+                        }
+                    });
+                } else {
+                    console.error("Invalid Video ID for song:", playlistSongs[currentSongIndex]);
+                }
+            }
+        }
+
+        // Inițializează API-ul YouTube
+        window.onYouTubeIframeAPIReady = function () {
+            player = new YT.Player('player', {
+                height: '360',
+                width: '640',
+                videoId: extractYouTubeId(playlistSongs[currentSongIndex]),
+                events: {
+                    'onReady': function (event) {
+                        loadSong(currentSongIndex);
+                    },
+                    'onStateChange': function (event) {
+                        if (event.data === YT.PlayerState.ENDED) {
+                            currentSongIndex = (currentSongIndex + 1) % playlistSongs.length;
+                            loadSong(currentSongIndex);
+                        }
+                    }
+                }
+            });
+        };
+
+        // Butoane pentru Next și Previous
+        document.getElementById("prev-song").addEventListener("click", function () {
+            currentSongIndex = (currentSongIndex - 1 + playlistSongs.length) % playlistSongs.length;
+            loadSong(currentSongIndex);
+        });
+
+        document.getElementById("next-song").addEventListener("click", function () {
+            currentSongIndex = (currentSongIndex + 1) % playlistSongs.length;
+            loadSong(currentSongIndex);
+        });
+
+        // Încarcă scriptul YouTube API
+        const script = document.createElement('script');
+        script.src = "https://www.youtube.com/iframe_api";
+        document.body.appendChild(script);
+    });
+
+</script>
+
+<style>
+    #youtube-player-container {
+        margin-top: 20px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        text-align: center;
+    }
+
+        #youtube-player-container button {
+            margin-right: 5px;
+        }
+
+    #current-song-title {
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
+    #player {
+        margin-bottom: 10px;
+    }
+</style>

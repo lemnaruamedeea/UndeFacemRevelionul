@@ -27,26 +27,26 @@
                             if (role == "Partier")
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link" href="/Partier/Dashboard">Petrecăreț Dashboard</a>
+                                    <a class="nav-link" href="/Partier/Dashboard" onclick="showLoading()">Partier Dashboard</a>
                                 </li>
                             }
                             else if (role == "Provider")
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link" href="/Provider/Dashboard">Furnizor Dashboard</a>
+                                    <a class="nav-link" href="/Provider/Dashboard" onclick="showLoading()">Provider Dashboard</a>
                                 </li>
                             }
                             else if (role == "Admin")
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link" href="/Admin/Dashboard">Admin Dashboard</a>
+                                    <a class="nav-link" href="/Admin/Dashboard" onclick="showLoading()">Admin Dashboard</a>
                                 </li>
                             }
 
                             <li class="nav-item">
                                 <form method="post" action="/Account/Logout" class="d-inline">
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-link nav-link text-danger">Logout</button>
+                                    <button type="submit" class="btn btn-link nav-link text-danger" onclick="showLoading()">Logout</button>
                                 </form>
                             </li>
                         }
