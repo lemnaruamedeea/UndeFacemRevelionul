@@ -10,6 +10,8 @@ using System.Linq;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
+using System.Threading;
+
 
 namespace UndeFacemRevelionul.Controllers;
 
@@ -213,6 +215,15 @@ public class PartierController : Controller
                 PartierId = partier.Id
             };
 
+            var defaultTasks = new List<TaskModel>
+            {
+                new TaskModel { PartyId = party.Id, Name = "Rezervare locație", IsCompleted = false, Points = 100 },
+                new TaskModel { PartyId = party.Id, Name = "Alegere meniu", IsCompleted = false, Points = 100 },
+                new TaskModel { PartyId = party.Id, Name = "Playlist", IsCompleted = false, Points = 100 }
+            };
+
+            _context.Tasks.AddRange(defaultTasks);
+
             party.PartyUsers.Add(partyUser);
             _context.PartyPartiers.Add(partyUser);
             _context.SaveChanges();
@@ -325,10 +336,124 @@ public class PartierController : Controller
         var partierNames = partyPartiers.Select(partier => partier.User.Name).ToList();
         ViewBag.PartierNames = partierNames;
 
+        var superstitions = _context.Superstitions
+        .Where(s => s.PartyId == id)
+        .ToList();
+        ViewBag.Superstitions = superstitions;
+
         UpdatePartyTotalPoints(id);
 
         return View(party);
     }
+
+    public IActionResult AddSuperstition(int partyId)
+    {
+        var model = new AddSuperstitionViewModel
+        {
+            PartyId = partyId
+        };
+
+        return View(model);
+    }
+
+    [HttpPost]
+    public IActionResult AddSuperstition(AddSuperstitionViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            TempData["ErrorMessage"] = "Invalid input data.";
+            return View(model);
+        }
+
+        var currentPartier = _context.Partiers.FirstOrDefault(p => p.UserId == GetCurrentUserId());
+        if (currentPartier == null)
+        {
+            TempData["ErrorMessage"] = "The current partier could not be found.";
+            return RedirectToAction("PartyDetails", new { id = model.PartyId });
+        }
+
+        var party = _context.Parties.FirstOrDefault(p => p.Id == model.PartyId);
+        if (party == null)
+        {
+            TempData["ErrorMessage"] = "Party not found.";
+            return RedirectToAction("Dashboard", "Partier");
+        }
+
+        var superstition = new SuperstitionModel
+        {
+            Name = model.Name,
+            Points = model.Points,
+            PartyId = model.PartyId,
+            PartierId = currentPartier.Id,
+            IsCompleted = false
+        };
+
+        try
+        {
+            _context.Superstitions.Add(superstition);
+            _context.SaveChanges();
+            TempData["SuccessMessage"] = "Superstition added successfully.";
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = "Error while adding superstition: " + ex.Message;
+        }
+
+        return RedirectToAction("PartyDetails", new { id = model.PartyId });
+    }
+
+
+
+
+    [HttpPost]
+    public async Task<IActionResult> CompleteSuperstition(SuperstitionCompletionViewModel model)
+    {
+        var superstition = await _context.Superstitions
+            .FirstOrDefaultAsync(s => s.Id == model.SuperstitionId && s.PartyId == model.PartyId);
+
+        if (superstition == null)
+        {
+            // Superstiția nu există
+            return NotFound();
+        }
+
+        // Dacă superstiția este completată
+        if (!superstition.IsCompleted)
+        {
+            // Dacă există o imagine
+            if (model.Image != null && model.Image.Length > 0)
+            {
+                // Salvează imaginea pe server
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", model.Image.FileName);
+
+                // Salvează imaginea în server
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.Image.CopyToAsync(stream);
+                }
+
+                // Salvează calea imaginii
+                superstition.ImagePath = "/images/" + model.Image.FileName;
+            }
+
+            // Marcam superstitiile ca completate si adaugam punctele
+            superstition.IsCompleted = true;
+
+            // Adăugăm punctele superstitiilor la totalul petrecerii
+            var party = await _context.Parties
+                .FirstOrDefaultAsync(p => p.Id == model.PartyId);
+
+            if (party != null)
+            {
+                party.TotalPoints += superstition.Points;
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        return RedirectToAction("PartyDetails", new { id = model.PartyId });
+    }
+
+
 
 
     // GET: EditParty
@@ -418,6 +543,9 @@ public class PartierController : Controller
         var partyPartiers = _context.PartyPartiers.Where(pp => pp.PartyId == id).ToList();
         _context.PartyPartiers.RemoveRange(partyPartiers);
 
+        var partyTasks = _context.Tasks.Where(t => t.PartyId == id).ToList();
+        _context.Tasks.RemoveRange(partyTasks);
+
         // Șterge petrecerea
         _context.Parties.Remove(party);
 
@@ -489,9 +617,14 @@ public class PartierController : Controller
 
         // Aplicăm reducerea dacă punctele depășesc 10.000
         float? discountedPrice = null;
-        if (totalPoints > 10000 && party.FoodMenu != null)
+        if (totalPoints > 10000 && totalPoints < 15000 && party.FoodMenu != null)
         {
             discountedPrice = party.FoodMenu.Price * 0.9f; // Reducere de 10%
+        }
+
+        if (totalPoints > 15000 && party.FoodMenu != null)
+        {
+            discountedPrice = party.FoodMenu.Price * 0.85f; // Reducere de 15%
         }
 
         var viewModel = new ListMenusViewModel
@@ -512,18 +645,61 @@ public class PartierController : Controller
     {
         var party = _context.Parties
             .Include(p => p.Location)
+            .Include(p => p.PartyUsers)
+                .ThenInclude(pu => pu.Partier)
+            .Include(p => p.FoodMenu)
             .FirstOrDefault(p => p.Id == partyId);
 
         if (party == null)
             return NotFound();
 
+        if (party != null)
+        {
+            party.FoodMenuId = menuId;
+
+            // Găsim task-ul "Alegere meniu"
+            var task = _context.Tasks.FirstOrDefault(t => t.PartyId == partyId && t.Name == "Alegere meniu");
+            var partier = _context.Partiers.FirstOrDefault(p => p.Id == task.PartierId);
+            if (task != null)
+            {
+                task.IsCompleted = true; // Bifăm task-ul
+                if (partier != null)
+                {
+                    partier.Points += task.Points;
+                }
+                else {
+                    TempData["ErrorMessage"] = "Trebuie sa iti iei task!";
+                    return RedirectToAction("ListMenus", new { partyId });
+                }
+            }
+
+        }
+
         var menu = _context.FoodMenus.Find(menuId);
         if (menu == null)
             return NotFound();
 
-        float locationPrice = party.Location?.Price ?? 0;
-        float newRemainingBudget = party.TotalBudget - menu.Price - locationPrice;
+        // Calculăm totalul punctelor
+        int totalPoints = party.PartyUsers?.Sum(pu => pu.Partier.Points) ?? 0;
 
+        // Aplicăm reducerea dacă punctele depășesc 10.000
+        float? discountedPrice = null;
+        if (totalPoints > 10000 && totalPoints < 15000 && party.FoodMenu != null)
+        {
+            discountedPrice = party.FoodMenu.Price * 0.9f; // Reducere de 10%
+        }
+
+        if (totalPoints > 15000 && party.FoodMenu != null)
+        {
+            discountedPrice = party.FoodMenu.Price * 0.85f; // Reducere de 15%
+        }
+
+        // Asigurăm că se folosește prețul redus dacă există
+        float menuPrice = discountedPrice ?? menu.Price;
+        float locationPrice = party.Location?.Price ?? 0;
+        float newRemainingBudget = party.TotalBudget - menuPrice - locationPrice;
+
+        
         if (newRemainingBudget < 0)
         {
             TempData["ErrorMessage"] = "Nu ai suficient buget pentru acest meniu!";
@@ -535,7 +711,7 @@ public class PartierController : Controller
 
         _context.SaveChanges();
 
-        return RedirectToAction("Dashboard", new { id = partyId });
+        return RedirectToAction("PartyDetails", new { id = partyId });
     }
 
 
@@ -592,9 +768,14 @@ public class PartierController : Controller
 
         // Aplică reducerea dacă punctele depășesc 10.000
         float? discountedPrice = null;
-        if (totalPoints > 10000 && party.Location != null)
+        if (totalPoints > 10000 && totalPoints < 15000 && party.Location != null)
         {
             discountedPrice = party.Location.Price * 0.9f;
+        }
+
+        if (totalPoints > 15000 && party.Location != null)
+        {
+            discountedPrice = party.Location.Price * 0.85f;
         }
 
         var viewModel = new ListLocationsViewModel
@@ -616,18 +797,52 @@ public class PartierController : Controller
     {
         var party = _context.Parties
             .Include(p => p.FoodMenu)
+            .Include(p => p.PartyUsers)
+                .ThenInclude(pu => pu.Partier)
+            .Include(p => p.Location)
             .FirstOrDefault(p => p.Id == partyId);
 
         if (party == null)
             return NotFound();
 
+        if (party != null)
+        {
+            party.LocationId = locationId;
+
+            // Găsim task-ul "Rezervare locație"
+            var task = _context.Tasks.FirstOrDefault(t => t.PartyId == partyId && t.Name == "Rezervare locație");
+            var partier = _context.Partiers.FirstOrDefault(p => p.Id == task.PartierId);
+            if (task != null)
+            {
+                task.IsCompleted = true; // Bifăm task-ul
+                partier.Points += task.Points;
+            }
+
+        }
+
         var location = _context.Locations.Find(locationId);
         if (location == null)
             return NotFound();
 
-        float menuPrice = party.FoodMenu?.Price ?? 0;
-        float newRemainingBudget = party.TotalBudget - location.Price - menuPrice;
+        // Calculează totalul punctelor
+        int totalPoints = party.PartyUsers?.Sum(pu => pu.Partier.Points) ?? 0;
 
+        // Aplică reducerea dacă punctele depășesc 10.000
+        float? discountedPrice = null;
+        if (totalPoints > 10000 && totalPoints < 15000 && party.Location != null)
+        {
+            discountedPrice = party.Location.Price * 0.9f;
+        }
+
+        if (totalPoints > 15000 && party.Location != null)
+        {
+            discountedPrice = party.Location.Price * 0.85f;
+        }
+
+        float locationPrice = discountedPrice ?? location.Price;
+        float menuPrice = party.FoodMenu?.Price ?? 0;
+        float newRemainingBudget = party.TotalBudget - menuPrice - locationPrice;
+        
         if (newRemainingBudget < 0)
         {
             TempData["ErrorMessage"] = "Nu ai suficient buget pentru această locație!";
@@ -639,7 +854,7 @@ public class PartierController : Controller
 
         _context.SaveChanges();
 
-        return RedirectToAction("Dashboard", new { id = partyId });
+        return RedirectToAction("PartyDetails", new { id = partyId });
     }
 
 
@@ -720,20 +935,43 @@ public class PartierController : Controller
 
     private void UpdatePartyTotalPoints(int partyId)
     {
-
+        // Găsim petrecerea și includem superstitiile
         var party = _context.Parties
-            .Include(p => p.PartyUsers) // relația PartyPartiers
-            .ThenInclude(pp => pp.Partier)
+            .Include(p => p.PartyUsers) // Relația PartyPartiers
+                .ThenInclude(pp => pp.Partier)
+            .Include(p => p.Superstitions) // Include superstitiile asociate petrecerii
             .FirstOrDefault(p => p.Id == partyId);
 
         if (party == null)
         {
             throw new Exception("Petrecerea nu a fost găsită.");
         }
+
+        // Calculăm punctele totale ale partierilor
         int totalPoints = party.PartyUsers.Sum(pu => pu.Partier.Points);
+
+        // Adăugăm punctele superstitiilor completate
+        var completedSuperstitionsPoints = party.Superstitions
+            .Where(s => s.IsCompleted)
+            .Sum(s => s.Points);
+
+        // Debug: Adăugăm loguri pentru a vedea ce se întâmplă
+        Debug.WriteLine($"Total Points from Party Users: {totalPoints}");
+        Debug.WriteLine($"Completed Superstitions Points: {completedSuperstitionsPoints}");
+
+        // Adăugăm punctele superstitiilor completate
+        totalPoints += completedSuperstitionsPoints;
+
+        // Debug: Verificăm totalul final de puncte
+        Debug.WriteLine($"Final Total Points for Party {partyId}: {totalPoints}");
+
+        // Setăm punctele totale ale petrecerii
         party.TotalPoints = totalPoints;
+
+        // Salvăm schimbările în baza de date
         _context.SaveChanges();
     }
+
 
     [HttpGet]
     public IActionResult PartyTasks(int id)
@@ -820,26 +1058,38 @@ public class PartierController : Controller
 
             if (partier != null)
             {
-                // Verificăm și schimbăm starea task-ului
-                if (!task.IsCompleted)
+
+                if (task.Name != "Alegere meniu" && task.Name != "Rezervare locație" && task.Name != "Playlist")
                 {
-                    // Dacă task-ul nu este completat, îl completăm și adăugăm punctele
-                    task.IsCompleted = true;
-                    partier.Points += task.Points; // Adaugăm punctele la Partier
+                    // Verificăm și schimbăm starea task-ului
+                    if (!task.IsCompleted)
+                    {
+                        // Dacă task-ul nu este completat, îl completăm și adăugăm punctele
+                        task.IsCompleted = true;
+                        partier.Points += task.Points; // Adaugăm punctele la Partier
+                    }
+                    else
+                    {
+                        // Dacă era deja completat, îl setăm ca necompletat și scădem punctele
+                        task.IsCompleted = false;
+                        partier.Points -= task.Points; // Scădem punctele din Partier
+                    }
                 }
+
                 else
                 {
-                    // Dacă era deja completat, îl setăm ca necompletat și scădem punctele
-                    task.IsCompleted = false;
-                    partier.Points -= task.Points; // Scădem punctele din Partier
+                    TempData["ErrorMessage"] = "Nu poți schimba starea acestui task!";
                 }
 
                 _context.SaveChanges();
             }
         }
-
+        UpdatePartyTotalPoints(partyId);
         return RedirectToAction("PartyDetails", new { id = partyId });
     }
+
+
+
 
 
 }

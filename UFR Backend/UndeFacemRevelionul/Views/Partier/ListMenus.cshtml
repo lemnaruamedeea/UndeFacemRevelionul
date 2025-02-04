@@ -11,15 +11,17 @@
     </div>
 </div>
 
+
+<div class="menu-selection">
+    <h2>Select a menu option</h2>
+</div>
+
 @if (TempData["ErrorMessage"] != null)
 {
     <div class="alert alert-danger">
         @TempData["ErrorMessage"]
     </div>
 }
-<div class="menu-selection">
-    <h2>Select a menu option</h2>
-</div>
 
 <!-- FORMULAR DE FILTRARE -->
 <form method="get" asp-action="ListMenus">
@@ -73,15 +75,20 @@
                 <td>@menu.Name</td>
                 <td>@menu.Description</td>
                 <td>
-                    @if (Model.TotalPoints > 10000)
-                    {
-                        <span style="text-decoration: line-through;">@menu.Price</span>
-                        <span style="color: green; font-weight: bold;">@((menu.Price * 0.9).ToString("F2"))</span>
-                    }
-                    else
-                    {
-                        @menu.Price
-                    }
+                        @if (Model.TotalPoints > 10000 && Model.TotalPoints < 15000)
+                        {
+                            <span style="text-decoration: line-through;">@menu.Price</span>
+                            <span style="color: green; font-weight: bold;">@((menu.Price * 0.9).ToString("F2"))</span> <!-- Reducere de 10% -->
+                        }
+                        else if (Model.TotalPoints > 15000)
+                        {
+                            <span style="text-decoration: line-through;">@menu.Price</span>
+                            <span style="color: green; font-weight: bold;">@((menu.Price * 0.85).ToString("F2"))</span> <!-- Reducere de 15% -->
+                        }
+						else
+						{
+							@menu.Price
+						}
                 </td>
                 <td>@menu.Rating</td>
                 <td>@menu.Provider?.User.Name</td>
@@ -154,8 +161,14 @@
             var priceElement = document.getElementById('menuPrice');
             var priceOriginalElement = document.getElementById('menuPriceOriginal');
 
-            if (totalPoints > 10000) {
+            if (totalPoints > 10000 && totalPoints < 15000) {
                 var discountedPrice = (price * 0.9).toFixed(2);
+                priceOriginalElement.style.display = "inline";
+                priceOriginalElement.innerText = price.toFixed(2);
+                priceElement.innerText = discountedPrice;
+            }
+            else if (totalPoints > 15000) {
+                var discountedPrice = (price * 0.85).toFixed(2);
                 priceOriginalElement.style.display = "inline";
                 priceOriginalElement.innerText = price.toFixed(2);
                 priceElement.innerText = discountedPrice;

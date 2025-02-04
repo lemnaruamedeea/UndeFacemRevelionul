@@ -6,6 +6,7 @@ using UndeFacemRevelionul.Models;
 using Google.Apis.YouTube.v3;
 using Google.Apis.Services;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace UndeFacemRevelionul.Controllers
 {
@@ -44,7 +45,10 @@ namespace UndeFacemRevelionul.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddSongToPlaylist(int playlistId, string songTitle, string artistName)
         {
-            var playlist = _context.Playlists.Include(pl => pl.PlaylistSongs).FirstOrDefault(pl => pl.Id == playlistId);
+            var playlist = _context.Playlists
+                .Include(pl => pl.PlaylistSongs)
+                .FirstOrDefault(pl => pl.Id == playlistId);
+
             if (playlist == null)
                 return NotFound();
 
@@ -81,6 +85,21 @@ namespace UndeFacemRevelionul.Controllers
 
             _context.PlaylistSongs.Add(playlistSong);
             await _context.SaveChangesAsync();
+
+            // **Verificăm dacă playlist-ul are acum mai mult de 10 melodii**
+            int songCount = playlist.PlaylistSongs.Count + 1; // Adăugăm și melodia curentă
+
+            if (songCount > 10)
+            {
+                var task = _context.Tasks.FirstOrDefault(t => t.PartyId == playlist.PartyId && t.Name == "Playlist");
+                var partier = _context.Partiers.FirstOrDefault(p => p.Id == task.PartierId);
+                if (task != null && !task.IsCompleted)
+                {
+                    task.IsCompleted = true; // Bifăm task-ul
+                    partier.Points += task.Points;
+                    _context.SaveChanges();
+                }
+            }
 
             return RedirectToAction("PartyDetails", "Partier", new { id = playlist.PartyId });
         }

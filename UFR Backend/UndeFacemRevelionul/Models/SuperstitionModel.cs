@@ -15,5 +15,8 @@
 
         public bool IsCompleted { get; set; }
         public int Points { get; set; }
+
+        // Calea fișierului de imagine
+        public string ImagePath { get; set; } = string.Empty;
     }
 }

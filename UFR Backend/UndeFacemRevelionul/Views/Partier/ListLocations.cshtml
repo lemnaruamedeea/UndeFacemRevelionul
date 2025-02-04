@@ -11,17 +11,20 @@
     </div>
 </div>
 
+
+
+<!-- Secțiunea de text "Selectează o locație" -->
+<div class="menu-selection">
+    <h2>Select a location</h2>
+</div>
+
+
 @if (TempData["ErrorMessage"] != null)
 {
     <div class="alert alert-danger">
         @TempData["ErrorMessage"]
     </div>
 }
-
-<!-- Secțiunea de text "Selectează o locație" -->
-<div class="menu-selection">
-    <h2>Select a location</h2>
-</div>
 
 <!-- FORMULAR DE FILTRARE -->
 <form method="get" asp-action="ListLocations">
@@ -83,10 +86,15 @@
                     <td>@location.Address</td>
                     <td>@location.Description</td>
                     <td>
-                        @if (Model.TotalPoints > 10000)
+                        @if (Model.TotalPoints > 10000 && Model.TotalPoints < 15000)
                         {
                             <span style="text-decoration: line-through;">@location.Price</span>
-                            <span style="color: green; font-weight: bold;">@((location.Price * 0.9).ToString("F2"))</span>
+                            <span style="color: lightgreen; font-weight: bold;">@((location.Price * 0.9).ToString("F2"))</span> <!-- Reducere de 10% -->
+                        }
+                        else if (Model.TotalPoints > 15000)
+                        {
+                            <span style="text-decoration: line-through;">@location.Price</span>
+                            <span style="color: lightgreen; font-weight: bold;">@((location.Price * 0.85).ToString("F2"))</span> <!-- Reducere de 15% -->
                         }
                         else
                         {
@@ -183,8 +191,14 @@
                 var priceElement = document.getElementById('locationPrice');
                 var priceOriginalElement = document.getElementById('locationPriceOriginal');
 
-                if (totalPoints > 10000) {
+                if (totalPoints > 10000 && totalPoints < 15000) {
                     var discountedPrice = (price * 0.9).toFixed(2); // Reducere de 10%
+                    priceOriginalElement.style.display = "inline"; // Afișează prețul original tăiat
+                    priceOriginalElement.innerText = price.toFixed(2);
+                    priceElement.innerText = discountedPrice;
+                }
+                else if (totalPoints > 15000) {
+                    var discountedPrice = (price * 0.85).toFixed(2); // Reducere de 10%
                     priceOriginalElement.style.display = "inline"; // Afișează prețul original tăiat
                     priceOriginalElement.innerText = price.toFixed(2);
                     priceElement.innerText = discountedPrice;
