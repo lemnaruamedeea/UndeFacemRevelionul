@@ -1,4 +1,8 @@
 .vs/
+*.wsuo
+*.backup.json
+*.sqlite
+
 # Directoare și fișiere build
 bin/
 obj/
