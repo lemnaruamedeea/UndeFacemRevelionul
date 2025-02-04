@@ -1,0 +1,29 @@
+﻿<h2>Locations List</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nume</th>
+            <th>Adresă</th>
+            <th>Furnizor</th>
+            <th>Acțiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var location in Model)
+        {
+            <tr>
+                <td>@location.Id</td>
+                <td>@location.Name</td>
+                <td>@location.Address</td>
+                <td>@(location.Provider?.Name ?? "N/A")</td>
+                <td>
+                    <form asp-action="DeleteLocation" method="post" style="display:inline;">
+                        <input type="hidden" name="id" value="@location.Id" />
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Sigur vrei să ștergi această locație?');">Șterge</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

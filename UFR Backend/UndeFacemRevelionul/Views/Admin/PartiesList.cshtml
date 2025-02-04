@@ -1,0 +1,24 @@
+﻿<h2>Parties List</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nume</th>
+            <th>Data</th>
+            <th>Locație</th>
+            <th>Meniu</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var party in Model)
+        {
+                <tr>
+                    <td>@party.Id</td>
+                    <td>@party.Name</td>
+                    <td>@party.Date.ToString("dd/MM/yyyy")</td>
+                    <td>@(party.Location?.Name ?? "N/A")</td>
+                    <td>@(party.FoodMenu?.Name ?? "N/A")</td>
+                </tr>
+        }
+    </tbody>
+</table>
