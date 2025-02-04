@@ -12,6 +12,16 @@
 </div>
 
 
+<div class="menu-selection">
+    <h2>Select a menu option</h2>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
 
 <!-- FORMULAR DE FILTRARE -->
 <form method="get" asp-action="ListMenus">

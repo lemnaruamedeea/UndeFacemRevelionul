@@ -208,7 +208,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var member in Model.PartyUsers)
+                    @foreach (var member in Model.PartyUsers.OrderByDescending(m => m.Partier.Points))
                     {
                         <tr>
                             <td>@member.Partier.User.Name</td>
