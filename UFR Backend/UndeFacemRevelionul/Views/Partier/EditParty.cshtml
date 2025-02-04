@@ -1,26 +1,202 @@
 ﻿@model UndeFacemRevelionul.Models.PartyModel
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">
-        @TempData["ErrorMessage"]
-    </div>
+
+@{
+    ViewData["Title"] = "Edit Party";
 }
 
-<h2>Edit</h2>
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        /* General styles */
+        body {
+            background: linear-gradient(to right, #ff99cc, #cc66ff, #9900cc);
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            color: white;
+            flex-direction: column;
+        }
 
-<form asp-action="EditParty" method="post" onsubmit="showLoading()">
-    <input type="hidden" asp-for="Id" />
-    <div class="form-group">
-        <label asp-for="Name"></label>
-        <input asp-for="Name" class="form-control" />
+        /* Navbar styles */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to right, #660066, #4d004d);
+            padding: 15px 0;
+            text-align: center;
+            box-shadow: none;
+            z-index: 1000;
+            font-family: 'Arial', sans-serif;
+        }
+
+            .navbar a {
+                color: white;
+                font-size: 1.6rem;
+                text-decoration: none;
+                font-weight: bold;
+                margin: 0 20px;
+            }
+
+            .navbar .nav-buttons {
+                position: absolute;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+        /* Button styles */
+        .btn-primary {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            padding: 12px 30px;
+            font-size: 1.4rem;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+            .btn-primary:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+        /* Logout button styles */
+        .btn-logout {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            padding: 12px 30px;
+            font-size: 1.4rem;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+            .btn-logout:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+        /* Form container styles */
+        .form-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            margin-top: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h2 {
+            color: #9900cc;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+            .form-group label {
+                font-size: 1.1rem;
+                font-weight: bold;
+                color: #4d004d;
+                display: block;
+                margin-bottom: 5px;
+            }
+
+            .form-group input {
+                width: 100%;
+                padding: 10px;
+                font-size: 1rem;
+                border-radius: 10px;
+                border: 2px solid #cc66ff;
+                background-color: #f9f9f9;
+                color: #4d004d;
+                outline: none;
+                transition: all 0.3s ease;
+            }
+
+                .form-group input:focus {
+                    border-color: #9900cc;
+                    background-color: #ffffff;
+                }
+
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <a href="@Url.Action("Index", "Dashboard")" class="navbar-title">Unde Facem Revelionul?</a>
+        <div class="nav-buttons">
+            <!-- Removed 'Back to Dashboard' -->
+            <form asp-action="Logout" asp-controller="Account" method="post" style="display: inline;">
+                <button type="submit" class="btn-logout">Logout</button>
+            </form>
+        </div>
     </div>
-    <div class="form-group">
-        <label asp-for="Date"></label>
-        <input asp-for="Date" type="date" class="form-control" />
+
+    <!-- Form container -->
+    <div class="form-container">
+        <h2>Edit Party</h2>
+
+        <form asp-action="EditParty" method="post">
+            <input type="hidden" asp-for="Id" />
+
+            <!-- Name -->
+            <div class="form-group">
+                <label asp-for="Name"></label>
+                <input asp-for="Name" class="form-control" />
+            </div>
+
+            <!-- Date -->
+            <div class="form-group">
+                <label asp-for="Date"></label>
+                <input asp-for="Date" type="date" class="form-control" />
+            </div>
+
+            <!-- Total Budget -->
+            <div class="form-group">
+                <label asp-for="TotalBudget"></label>
+                <input asp-for="TotalBudget" type="number" class="form-control" />
+            </div>
+
+            <!-- Remaining Budget -->
+             <!--div class="form-group">
+                 <!--abel asp-for="RemainingBudget"></!--abel>
+                 <!--input asp-for="RemainingBudget" type="number" class="form-control" />
+             </!--div>
+
+            <!-- Save Button -->
+            <button type="submit" class="btn btn-primary">Save</button>
+
+            <!-- Back Button -->
+            <button type="submit" class="btn btn-primary">Back</button>
+
+        </form>
+
     </div>
-    <div class="form-group">
-        <label asp-for="TotalBudget"></label>
-        <input asp-for="TotalBudget" type="number" class="form-control" />
-    </div>
-    <button type="submit" class="btn btn-primary">Save</button>
-</form>
+
+</body>
+</html>

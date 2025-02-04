@@ -1,40 +1,168 @@
 ﻿@model UndeFacemRevelionul.ViewModels.AddLocationViewModel
 
-<h2>Add Location</h2>
+@{
+    ViewData["Title"] = "Add Location";
+}
 
-<form asp-action="AddLocation" method="post" onsubmit="showLoading()">
-    <input type="hidden" asp-for="ProviderId" value="@ViewBag.ProviderId" />
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            background: linear-gradient(to right, #ff99cc, #cc66ff, #9900cc);
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            color: white;
+            flex-direction: column;
+        }
 
-    <div class="form-group">
-        <label for="Name">Name</label>
-        <input type="text" class="form-control" asp-for="Name" required />
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to right, #660066, #4d004d);
+            padding: 25px 0;
+            text-align: center;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+            .navbar a {
+                color: white;
+                font-size: 1.6rem;
+                text-decoration: none;
+                font-weight: bold;
+            }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            margin-top: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #9900cc;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+            .form-group label {
+                font-size: 1.1rem;
+                font-weight: bold;
+                color: #4d004d;
+                display: block;
+                margin-bottom: 5px;
+            }
+
+            .form-group input, .form-group textarea {
+                width: 100%;
+                padding: 10px;
+                font-size: 1rem;
+                border-radius: 10px;
+                border: 2px solid #cc66ff;
+                background-color: #f9f9f9;
+                color: #4d004d;
+                outline: none;
+                transition: all 0.3s ease;
+            }
+
+                .form-group input:focus, .form-group textarea:focus {
+                    border-color: #9900cc;
+                    background-color: #ffffff;
+                }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 1.4rem;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+        }
+
+            .btn-primary:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+        .btn-secondary {
+            background: gray;
+            color: white;
+            margin-left: 10px;
+        }
+
+            .btn-secondary:hover {
+                transform: scale(1.05);
+                background: darkgray;
+            }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="@Url.Action("Index", "Home")">Unde Facem Revelionul?</a>
     </div>
 
-    <div class="form-group">
-        <label for="Address">Address</label>
-        <input type="text" class="form-control" asp-for="Address" required />
+    <div class="form-container">
+        <h1>Add Location</h1>
+        <form asp-action="AddLocation" method="post">
+            <input type="hidden" asp-for="ProviderId" value="@ViewBag.ProviderId" />
+
+            <div class="form-group">
+                <label>Name</label>
+                <input asp-for="Name" class="form-control" required />
+            </div>
+            <div class="form-group">
+                <label>Address</label>
+                <input asp-for="Address" class="form-control" required />
+            </div>
+            <div class="form-group">
+                <label>Price</label>
+                <input asp-for="Price" class="form-control" required type="number" />
+            </div>
+            <div class="form-group">
+                <label>Capacity</label>
+                <input asp-for="Capacity" class="form-control" required type="number" />
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea asp-for="Description" class="form-control" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Rating</label>
+                <input asp-for="Rating" class="form-control" required type="number" step="0.1" min="0" max="5" />
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a href="@Url.Action("Dashboard", "Provider", new { id = ViewBag.ProviderId })" class="btn btn-secondary">Cancel</a>
+
+        </form>
     </div>
-
-    <div class="form-group">
-        <label for="Price">Price</label>
-        <input type="number" class="form-control" asp-for="Price" required />
-    </div>
-
-    <div class="form-group">
-        <label for="Capacity">Capacity</label>
-        <input type="number" class="form-control" asp-for="Capacity" required />
-    </div>
-
-    <div class="form-group">
-        <label for="Description">Description</label>
-        <textarea class="form-control" asp-for="Description" required></textarea>
-    </div>
-
-    <div class="form-group">
-        <label for="Rating">Rating</label>
-        <input type="number" class="form-control" asp-for="Rating" required />
-    </div>
-
-    <button type="submit" class="btn btn-primary">Save</button>
-</form>
-
+</body>
+</html>

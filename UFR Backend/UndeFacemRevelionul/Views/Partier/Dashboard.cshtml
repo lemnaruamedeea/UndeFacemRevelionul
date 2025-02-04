@@ -3,38 +3,281 @@
     var userName = User.Identity.Name;  // Numele utilizatorului logat
 }
 
-<h1>Welcome, @userName!</h1>
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        /* Stiluri pentru pagina de dashboard */
 
-<p>Welcome to your Dashboard, where you can manage your events, view your profile, and more.</p>
-
-<h3>Your Profile</h3>
-<p><strong>Points:</strong> @ViewBag.PartierPoints</p>
-<p><strong>Rank:</strong> @ViewBag.RankName</p>
-
-<h3>Your parties</h3>
-@if (ViewBag.Parties != null && ((List<UndeFacemRevelionul.Models.PartyModel>)ViewBag.Parties).Any())
-{
-    <ul>
-        @foreach (var party in (List<UndeFacemRevelionul.Models.PartyModel>)ViewBag.Parties)
-        {
-            <li>
-                <a href="@Url.Action("PartyDetails", "Partier", new { id = party.Id })" onclick="showLoading()">
-                    @party.Name - @party.Date.ToString("dd/MM/yyyy") 
-                </a>
-                <br />
-                <small>Budget: @party.TotalBudget</small>
-                <br />
-                <small>Points: @party.TotalPoints</small>
-            </li>
+        /* Bara de navigație */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to right, #660066, #4d004d);
+            padding: 15px 0;
+            text-align: center;
+            box-shadow: none;
+            z-index: 1000;
+            font-family: 'Arial', sans-serif;
         }
-    </ul>
-}
-else
-{
-    <p>You have no parties yet.</p>
-}
 
-<h3>Create a new party</h3>
-<a href="@Url.Action("CreateParty", "Partier")" class="btn btn-primary">Create</a>
-<h3>Account Management</h3>
-<a href="@Url.Action("Edit", "Account")" class="btn btn-primary">Edit Account</a>
+            .navbar a {
+                color: white;
+                font-size: 1.6rem;
+                text-decoration: none;
+                font-weight: bold;
+                margin: 0 20px;
+            }
+
+            /* Modifică stilul butoanelor pentru a le face mai atractive */
+            .navbar .nav-buttons {
+                position: absolute;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+                .navbar .nav-buttons a {
+                    margin-left: 10px;
+                    padding: 12px 30px;
+                    background: linear-gradient(to right, #ff66b2, #9900cc);
+                    color: white;
+                    border-radius: 25px;
+                    text-decoration: none;
+                    font-size: 1.4rem;
+                    font-weight: bold;
+                    transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+                }
+
+                    .navbar .nav-buttons a:hover {
+                        transform: scale(1.05);
+                        background: linear-gradient(to right, #9900cc, #ff66b2);
+                    }
+
+        /* Titlu cu gradient */
+        .gradient-text {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.8rem;
+            font-weight: bold;
+        }
+
+        .nav-buttons form {
+            display: inline-block;
+        }
+
+        .nav-buttons button {
+            padding: 12px 30px;
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            border-radius: 25px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            text-decoration: none;
+            height: 50px; /* Fixează înălțimea ca la celelalte butoane */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .nav-buttons button:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+
+        /* Container pentru conținut */
+        .dashboard-container {
+            max-width: 900px;
+            margin: auto;
+            padding: 80px 20px 50px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Butoane personalizate */
+        .btn-primary {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            font-size: 1.4rem;
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            text-decoration: none; /* Elimină sublinierea */
+        }
+
+            .btn-primary:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+        /* Fundal roz-mov */
+        body {
+            background: linear-gradient(to right, #ff99cc, #cc66ff, #9900cc);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            font-family: Arial, sans-serif;
+            flex-direction: column;
+        }
+
+        /* Secțiunea pentru privatitate
+                .privacy-section {
+                    text-align: center;
+                    padding: 50px 20px;
+                    color: white;
+                    font-size: 1.1rem;
+                    margin-top: 40px;
+                }
+
+                    .privacy-section h2 {
+                        font-size: 1.8rem;
+                        font-weight: bold;
+                        margin-bottom: 10px;
+                    } */
+
+        /* Footer text */
+        .footer-text {
+            text-align: center;
+            font-size: 1rem;
+            color: white;
+            padding: 10px 20px;
+            background: none;
+            margin-top: 40px;
+        }
+
+        /* Container pentru petreceri */
+        .parties-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        /* Card pentru fiecare petrecere */
+        .party-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 250px;
+            transition: transform 0.3s ease-in-out;
+        }
+
+            /* Efect hover pentru carduri */
+            .party-card:hover {
+                transform: scale(1.05);
+                background-color: #f3e6f9; /* Nuantă mai deschisă pentru efect */
+            }
+
+        /* Card pentru profil */
+        .profile-card {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 350px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+
+
+        /* Linkul din cardul de petrecere */
+        .party-link {
+            color: #4d004d;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+            .party-link:hover {
+                color: #9900cc;
+            }
+
+    </style>
+</head>
+<body>
+
+    <<!-- Bara de navigație -->
+    <div class="navbar">
+        <a href="/" class="navbar-title">Unde Facem Revelionul?</a>
+        <div class="nav-buttons">
+            <form asp-action="Logout" asp-controller="Account" method="post">
+                <button type="submit">Logout</button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Conținutul dashboard-ului -->
+    <div class="dashboard-container">
+        <h1 class="gradient-text">Welcome, @userName!</h1>
+
+        <p>Welcome to your Dashboard, where you can manage your events, view your profile, and more.</p>
+
+        <h3>Your Profile</h3>
+        <div class="profile-card">
+            <p><strong>Points:</strong> @ViewBag.PartierPoints</p>
+            <p><strong>Rank:</strong> @ViewBag.RankName</p>
+        </div>
+
+
+        <h3>Your Parties</h3>
+        @if (ViewBag.Parties != null && ((List<UndeFacemRevelionul.Models.PartyModel>)ViewBag.Parties).Any())
+        {
+            <div class="parties-container">
+                @foreach (var party in (List<UndeFacemRevelionul.Models.PartyModel>)ViewBag.Parties)
+                {
+                    <div class="party-card">
+                        <a href="@Url.Action("PartyDetails", "Partier", new { id = party.Id })" class="party-link">
+                            <h4>@party.Name</h4>
+                            <p><strong>Date:</strong> @party.Date.ToString("dd/MM/yyyy")</p>
+                            <p><strong>Budget:</strong> @party.TotalBudget</p>
+                            <p><strong>Points:</strong> @party.TotalPoints</p>
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p>You have no parties yet.</p>
+        }
+
+
+        <h3>Create a New Party</h3>
+        <a href="@Url.Action("CreateParty", "Partier")" class="btn-primary">Create</a>
+
+        <h3>Account Management</h3>
+        <a href="@Url.Action("Edit", "Account")" class="btn-primary">Edit Account</a>
+    </div>
+
+    <!-- Footer
+    <div class="footer-text">
+        © 2024 - UndeFacemRevelionul - <a href="/Privacy">Privacy</a>
+    </div>
+    -->
+    <!-- Privacy Section
+    <div class="privacy-section">
+        <h2>Privacy & Terms</h2>
+        <p>We protect your data and respect user privacy. Read our privacy policy.</p>
+    </div> -->
+
+</body>
+</html>

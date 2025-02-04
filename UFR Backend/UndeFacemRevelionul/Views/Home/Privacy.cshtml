@@ -1,6 +1,161 @@
 ﻿@{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        /* Fundal gradient pentru pagină */
+        body {
+            background: linear-gradient(to right, #ff99cc, #cc66ff, #9900cc);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Bara de navigație */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to right, #660066, #4d004d);
+            padding: 15px 0;
+            text-align: center;
+            box-shadow: none;
+            z-index: 1000;
+            font-family: 'Arial', sans-serif;
+        }
+
+            .navbar a {
+                color: white;
+                font-size: 1.6rem;
+                text-decoration: none;
+                font-weight: bold;
+                margin: 0 20px;
+            }
+
+            /* Butoane navigație */
+            .navbar .nav-buttons {
+                position: absolute;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+                .navbar .nav-buttons a {
+                    margin-left: 10px;
+                    padding: 12px 30px;
+                    background: linear-gradient(to right, #ff66b2, #9900cc);
+                    color: white;
+                    border-radius: 25px;
+                    text-decoration: none;
+                    font-size: 1.4rem;
+                    font-weight: bold;
+                    transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+                }
+
+                    .navbar .nav-buttons a:hover {
+                        transform: scale(1.05);
+                        background: linear-gradient(to right, #9900cc, #ff66b2);
+                    }
+
+        /* Container pentru conținut */
+        .privacy-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 800px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            color: #333;
+            margin-top: 80px;
+        }
+
+        /* Titlu cu gradient */
+        .privacy-title {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        /* Stilizare paragrafe */
+        .privacy-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        /* Butoane stilizate */
+        .btn-primary {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            font-size: 1.4rem;
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+            .btn-primary:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+        /* Stilizare link-uri */
+        .privacy-container a {
+            color: #9900cc;
+            font-weight: bold;
+            text-decoration: none;
+            transition: color 0.3s ease-in-out;
+        }
+
+            .privacy-container a:hover {
+                color: #ff66b2;
+            }
+    </style>
+</head>
+<body>
+
+    <!-- Bara de navigație -->
+    <div class="navbar">
+        <a href="/" class="navbar-title">Unde Facem Revelionul?</a>
+        <!--
+        <div class="nav-buttons">
+            <a href="@Url.Action("Dashboard", "Partier")" class="btn-primary">Back to Dashboard</a>
+            <form asp-action="Logout" asp-controller="Account" method="post" style="display:inline;">
+                <button type="submit" class="btn-primary">Logout</button>
+            </form>
+        </div>
+        -->
+    </div>
+
+    <!-- Container Privacy Policy -->
+    <div class="privacy-container">
+        <h1 class="privacy-title">@ViewData["Title"]</h1>
+        <p class="privacy-text">
+            Welcome to our Privacy Policy page. Here we describe how we handle your data,
+            ensuring that your personal information remains safe and protected.
+        </p>
+        <p class="privacy-text">
+            For more details, please read our full <a href="/terms">Terms & Conditions</a>.
+        </p>
+    </div>
+
+</body>
+</html>

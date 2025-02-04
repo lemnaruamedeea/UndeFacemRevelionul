@@ -1,22 +1,198 @@
 ﻿@model UndeFacemRevelionul.ViewModels.AddTaskViewModel
 
-<h2>Add Task</h2>
+@{
+    ViewData["Title"] = "Add Task";
+}
 
-<form asp-action="AddTask" method="post" onsubmit="showLoading()">
-    <input type="hidden" asp-for="PartyId" />
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            background: linear-gradient(to right, #ff99cc, #cc66ff, #9900cc);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: white;
+        }
 
-    <div class="form-group">
-        <label asp-for="Name"></label>
-        <input asp-for="Name" class="form-control" required />
-        <span asp-validation-for="Name" class="text-danger"></span>
+        /* Bara de navigație */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to right, #660066, #4d004d);
+            padding: 15px;
+            text-align: center;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Titlul centrat */
+        .navbar-title {
+            color: white;
+            font-size: 1.6rem;
+            font-weight: bold;
+            flex-grow: 1;
+            text-align: center;
+            margin-left: 40px;
+        }
+
+        /* Buton Logout */
+        .logout-form {
+            margin-right: 20px;
+        }
+
+        .btn-logout {
+            padding: 12px 30px;
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+        }
+
+            .btn-logout:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+        /* Container centrat pentru formular */
+        .form-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h2 {
+            color: #9900cc;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+            .form-group label {
+                font-size: 1.1rem;
+                font-weight: bold;
+                color: #4d004d;
+                display: block;
+                margin-bottom: 5px;
+            }
+
+            .form-group input {
+                width: 100%;
+                padding: 10px;
+                font-size: 1rem;
+                border-radius: 10px;
+                border: 2px solid #cc66ff;
+                background-color: #f9f9f9;
+                color: #4d004d;
+                outline: none;
+                transition: all 0.3s ease;
+            }
+
+                .form-group input:focus {
+                    border-color: #9900cc;
+                    background-color: #ffffff;
+                }
+
+        /* Buton Add Task */
+        .btn-success {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+            .btn-success:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+        /* Buton Cancel */
+        .btn-secondary {
+            background: linear-gradient(to right, #cccccc, #999999);
+            color: white;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+            .btn-secondary:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #999999, #cccccc);
+            }
+    </style>
+</head>
+<body>
+
+    <!-- Bara de navigație -->
+    <div class="navbar">
+        <div class="navbar-title" style="text-align: left; margin-left: 20px;">Unde Facem Revelionul?</div>
+        <form asp-action="Logout" asp-controller="Account" method="post" class="logout-form">
+            <button type="submit" class="btn-logout">Logout</button>
+        </form>
     </div>
 
-    <div class="form-group">
-        <label asp-for="Points"></label>
-        <input asp-for="Points" class="form-control" type="number" min="0" required />
-        <span asp-validation-for="Points" class="text-danger"></span>
+    <!-- Formular pentru Adăugare Sarcină -->
+    <div class="form-container">
+        <h2>Add Task to @ViewBag.PartyName</h2>
+
+        <form asp-action="AddTask" method="post">
+            <input type="hidden" asp-for="PartyId" />
+
+            <!-- Name -->
+            <div class="form-group">
+                <label asp-for="Name"></label>
+                <input asp-for="Name" class="form-control" required />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <!-- Points -->
+            <div class="form-group">
+                <label asp-for="Points"></label>
+                <input asp-for="Points" class="form-control" type="number" min="0" required />
+                <span asp-validation-for="Points" class="text-danger"></span>
+            </div>
+
+            <!-- Add Task Button -->
+            <button type="submit" class="btn btn-success">Add Task</button>
+            <a asp-action="PartyDetails" asp-route-id="@Model.PartyId" class="btn btn-secondary mt-3">Cancel</a>
+        </form>
     </div>
 
-    <button type="submit" class="btn btn-success">Add Task</button>
-    <a asp-action="PartyDetails" asp-route-id="@Model.PartyId" class="btn btn-secondary">Cancel</a>
-</form>
+</body>
+</html>

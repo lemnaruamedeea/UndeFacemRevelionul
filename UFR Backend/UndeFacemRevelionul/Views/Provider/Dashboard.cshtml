@@ -4,94 +4,302 @@
     var menus = ViewBag.Menus as List<UndeFacemRevelionul.Models.FoodMenuModel>;
 }
 
-<h1>Welcome to your Provider Dashboard</h1>
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        /* Stiluri pentru pagina de dashboard */
 
-<!-- Buton pentru Adăugarea Locației -->
-<div>
-    <a href="@Url.Action("AddLocation", "Provider", new { providerId = ViewBag.ProviderId })" class="btn btn-primary mb-3">Add New Location</a>
-</div>
+        /* Bara de navigație */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to right, #660066, #4d004d);
+            padding: 15px 0;
+            text-align: center;
+            box-shadow: none;
+            z-index: 1000;
+            font-family: 'Arial', sans-serif;
+        }
 
-<h2>Your Locations</h2>
-@if (locations != null && locations.Count > 0)
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Address</th>
-                <th>Price</th>
-                <th>Capacity</th>
-                <th>Description</th>
-                <th>Rating</th>
-                <th>Date</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var location in locations)
-            {
-                <tr>
-                    <td>@location.Name</td>
-                    <td>@location.Address</td>
-                    <td>@location.Price</td>
-                    <td>@location.Capacity</td>
-                    <td>@location.Description</td>
-                    <td>@location.Rating</td>
-                    <td>@location.Date.ToString("dd/MM/yyyy")</td>
-                    <td>
-                        <!-- Butoane Edit și Delete -->
-                        <a href="@Url.Action("EditLocation", "Provider", new { id = location.Id })" class="btn btn-sm btn-warning">Edit</a>
-                        <form method="post" action="@Url.Action("DeleteLocation", "Provider", new { id = location.Id })" style="display:inline;">
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this location?');">Delete</button>
-                        </form>
-                    </td>
-                </tr>
+        .navbar {
+            height: 70px; /* Dacă e nevoie, ajustează înălțimea navbarului */
+            line-height: 70px;
+        }
+
+            .navbar a {
+                color: white;
+                font-size: 1.6rem;
+                text-decoration: none;
+                font-weight: bold;
+                margin: 0 20px;
             }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>You have no locations listed.</p>
-}
 
-<!-- Buton pentru Adăugarea Meniului -->
-<div>
-    <a href="@Url.Action("AddMenu", "Provider", new { providerId = ViewBag.ProviderId })" class="btn btn-primary mb-3">Add New Menu</a>
-</div>
-
-<h2>Your Menus</h2>
-@if (menus != null && menus.Count > 0)
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Price</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var menu in menus)
-            {
-                <tr>
-                    <td>@menu.Name</td>
-                    <td>@menu.Description</td>
-                    <td>@menu.Price</td>
-                    <td>
-                        <!-- Butoane Edit și Delete -->
-                        <a href="@Url.Action("EditMenu", "Provider", new { id = menu.Id })" class="btn btn-sm btn-warning">Edit</a>
-                        <form method="post" action="@Url.Action("DeleteMenu", "Provider", new { id = menu.Id })" style="display:inline;">
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this menu?');">Delete</button>
-                        </form>
-                    </td>
-                </tr>
+            /* Modifică stilul butoanelor pentru a le face mai atractive */
+            .navbar .nav-buttons {
+                position: absolute;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
             }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>You have no menus listed.</p>
-}
+
+                .navbar .nav-buttons a {
+                    margin-left: 10px;
+                    padding: 12px 30px;
+                    background: linear-gradient(to right, #ff66b2, #9900cc);
+                    color: white;
+                    border-radius: 25px;
+                    text-decoration: none;
+                    font-size: 1.4rem;
+                    font-weight: bold;
+                    transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+                }
+
+                    .navbar .nav-buttons a:hover {
+                        transform: scale(1.05);
+                        background: linear-gradient(to right, #9900cc, #ff66b2);
+                    }
+
+        /* Titlu cu gradient */
+        .gradient-text {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.8rem;
+            font-weight: bold;
+        }
+
+        .nav-buttons form {
+            display: inline-block;
+        }
+
+        .nav-buttons button {
+            padding: 12px 30px;
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            border-radius: 25px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            text-decoration: none;
+            height: 50px; /* Fixează înălțimea ca la celelalte butoane */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .nav-buttons button:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+
+        /* Container pentru conținut */
+        .dashboard-container {
+            max-width: 900px;
+            margin: auto;
+            padding: 80px 20px 50px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Butoane personalizate */
+        .btn-primary {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            font-size: 1.4rem;
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            text-decoration: none; /* Elimină sublinierea */
+        }
+
+            .btn-primary:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+        /* Stil pentru butonul Edit */
+        .btn-edit {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+            .btn-edit:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #9900cc, #ff66b2);
+            }
+
+        /* Stil pentru butonul Delete */
+        .btn-delete {
+            background: linear-gradient(to right, #ff4d4d, #cc0000);
+            color: white;
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+            .btn-delete:hover {
+                transform: scale(1.05);
+                background: linear-gradient(to right, #cc0000, #ff4d4d);
+            }
+
+        /* Fundal roz-mov */
+        body {
+            background: linear-gradient(to right, #ff99cc, #cc66ff, #9900cc);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            font-family: Arial, sans-serif;
+            flex-direction: column;
+            padding-top: 80px;
+        }
+
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+
+            .table th, .table td {
+                padding: 12px;
+                text-align: center;
+                border: 1px solid #ddd;
+            }
+
+            .table th {
+                background: linear-gradient(to right, #ff66b2, #9900cc);
+                color: white;
+                font-size: 1.2rem;
+            }
+
+            .table tr:hover {
+                background-color: #f3e6f9;
+            }
+
+    </style>
+</head>
+<body>
+    <<!-- Bara de navigație -->
+    <div class="navbar">
+        <a href="/" class="navbar-title">Unde Facem Revelionul?</a>
+        <div class="nav-buttons">
+            <form asp-action="Logout" asp-controller="Account" method="post">
+                <button type="submit">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Welcome to your Provider Dashboard</h1>
+
+        <a href="@Url.Action("AddLocation", "Provider", new { providerId = ViewBag.ProviderId })" class="btn btn-primary">Add New Location</a>
+
+        <h2>Your Locations</h2>
+        @if (locations != null && locations.Count > 0)
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Address</th>
+                        <th>Price</th>
+                        <th>Capacity</th>
+                        <th>Description</th>
+                        <th>Rating</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var location in locations)
+                    {
+                        <tr>
+                            <td>@location.Name</td>
+                            <td>@location.Address</td>
+                            <td>@location.Price</td>
+                            <td>@location.Capacity</td>
+                            <td>@location.Description</td>
+                            <td>@location.Rating</td>
+                            <td>@location.Date.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <a href="@Url.Action("EditLocation", "Provider", new { id = location.Id })" class="btn btn-edit">Edit</a>
+                                <form method="post" action="@Url.Action("DeleteLocation", "Provider", new { id = location.Id })" style="display:inline;">
+                                    <button type="submit" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this location?');">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>You have no locations listed.</p>
+        }
+
+        <a href="@Url.Action("AddMenu", "Provider", new { providerId = ViewBag.ProviderId })" class="btn btn-primary">Add New Menu</a>
+
+        <h2>Your Menus</h2>
+        @if (menus != null && menus.Count > 0)
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var menu in menus)
+                    {
+                        <tr>
+                            <td>@menu.Name</td>
+                            <td>@menu.Description</td>
+                            <td>@menu.Price</td>
+                            <td>
+                                <a href="@Url.Action("EditMenu", "Provider", new { id = menu.Id })" class="btn btn-edit">Edit</a>
+                                <form method="post" action="@Url.Action("DeleteMenu", "Provider", new { id = menu.Id })" style="display:inline;">
+                                    <button type="submit" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this menu?');">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>You have no menus listed.</p>
+        }
+    </div>
+</body>
+</html>

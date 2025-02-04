@@ -1,100 +1,300 @@
 ﻿@model UndeFacemRevelionul.Models.PartyModel
 
-<h1>Party: @Model.Name</h1>
-<p>Party date: @Model.Date.ToString("d")</p>
-<p>Total budget: @Model.TotalBudget</p>
-<p>Remaining budget: @Model.RemainingBudget</p>
-<p>Location: @Model.Location?.Name</p>
-<p>Menu: @Model.FoodMenu?.Name</p>
-<p>Party Points: @Model.TotalPoints</p>
-
-<h2>Members</h2>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Points</th>
-            <th>Remove member</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var member in Model.PartyUsers)
-        {
-            <tr>
-                <td>@member.Partier.User.Name</td>
-                <td>@member.Partier.Points</td>
-                <td>
-                    <form asp-action="RemoveMember" method="post" style="display:inline">
-                        <input type="hidden" name="partyId" value="@Model.Id" />
-                        <input type="hidden" name="partierId" value="@member.PartierId" />
-                        <button type="submit" class="btn btn-danger">Remove</button>
-                    </form>
-                </td>
-            </tr>
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Party: @Model.Name</title>
+    <style>
+        /* Stiluri generale pentru întreaga pagină */
+        body {
+            background: linear-gradient(to right, #ff99cc, #cc66ff, #9900cc); /* Gradient colorat pe fundal */
+            min-height: 100vh; /* Întregul conținut se va întinde pe întreaga înălțime a ecranului */
+            display: flex;
+            justify-content: center; /* Centrează conținutul pe orizontală */
+            align-items: flex-start; /* Centrează conținutul pe verticală */
+            font-family: Arial, sans-serif; /* Fontul utilizat */
+            flex-direction: column; /* Dispunerea conținutului într-o coloană */
         }
-    </tbody>
-</table>
-<a asp-action="AddMember" asp-route-partyId="@Model.Id" class="btn btn-success">Add member</a>
-<a asp-action="ListMenus" asp-route-partyId="@Model.Id" class="btn btn-success">Add Menu</a>
-<a asp-action="ListLocations" asp-route-partyId="@Model.Id" class="btn btn-success">Add Location</a>
-<a href="@Url.Action("EditParty", "Partier", new { id = Model.Id })" class="btn btn-primary">Edit Party</a>
-<a href="@Url.Action("DeleteParty", "Partier", new { id = Model.Id })" class="btn btn-danger">Delete Party</a>
-</br>
-<!-- My Tasks Section -->
-<h2>Tasks</h2>
 
-@if (ViewBag.AllTasks != null && (ViewBag.AllTasks as IEnumerable<UndeFacemRevelionul.Models.TaskModel>)?.Any() == true)
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Task</th>
-                <th>Status</th>
-                <th>Points</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var task in ViewBag.AllTasks)
-            {
-                <tr>
-                    <td>@task.Name</td>
-                    <td>
-                        <form asp-action="ToggleTaskCompletion" method="post" style="display:inline">
-                            <input type="hidden" name="taskId" value="@task.Id" />
-                            <input type="hidden" name="partyId" value="@Model.Id" />
-                            <input type="checkbox" onchange="this.form.submit()" @(task.IsCompleted ? "checked" : "") />
-                        </form>
-                    </td>
-                    <td>@task.Points</td>
-                    <td>
-                        @if (task.PartierId == null)
-                        {
-                            <form asp-action="ClaimTask" method="post" style="display:inline">
-                                <input type="hidden" name="taskId" value="@task.Id" />
-                                <input type="hidden" name="partyId" value="@Model.Id" />
-                                <button type="submit" class="btn btn-success">Claim Task</button>
-                            </form>
-                        }
-                        else
-                        {
-                            <span>Claimed by: @(task.Partier?.User?.Name ?? "Unknown")</span>
-                        }
+        /* Bara de navigație */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%; /* Bara va acoperi întreaga lățime a ecranului */
+            background: linear-gradient(to right, #660066, #4d004d); /* Gradient de culori pe fundal */
+            padding: 15px 0;
+            text-align: center; /* Alinierea textului în centru */
+            box-shadow: none; /* Fără umbră */
+            z-index: 1000; /* Asigură că bara de navigație este mereu vizibilă */
+            font-family: 'Arial', sans-serif;
+        }
 
-                    </td>
-                </tr>
+            .navbar a {
+                color: white; /* Culoarea textului */
+                font-size: 1.6rem;
+                text-decoration: none; /* Fără subliniere */
+                font-weight: bold;
+                margin: 0 20px;
             }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>No available tasks.</p>
-}
 
+            /* Butoane de navigație */
+            .navbar .nav-buttons {
+                position: absolute;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%); /* Centrează butoanele pe verticală */
+            }
 
-<!-- Buton pentru a naviga la PartyTasks -->
-<a asp-action="AddTask" asp-route-partyId="@Model.Id" class="btn btn-primary">Add Task</a>
+                .navbar .nav-buttons a {
+                    margin-left: 10px;
+                    padding: 12px 30px; /* Dimensiuni butoane */
+                    background: linear-gradient(to right, #ff66b2, #9900cc); /* Gradient pentru butoane */
+                    color: white;
+                    border-radius: 25px;
+                    text-decoration: none;
+                    font-size: 1.4rem;
+                    font-weight: bold;
+                    transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+                }
+
+                    .navbar .nav-buttons a:hover {
+                        transform: scale(1.05); /* Mărește butonul la hover */
+                        background: linear-gradient(to right, #9900cc, #ff66b2); /* Schimbă culoarea la hover */
+                    }
+
+        /* Stiluri pentru text cu gradient */
+        .gradient-text {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.8rem;
+            font-weight: bold;
+        }
+
+        /* Containerul principal pentru pagina de petrecere */
+        .dashboard-container {
+            max-width: 900px;
+            margin: 100px auto 50px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.9); /* Fundal ușor transparent */
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Adaugă umbră pentru un efect de adâncire */
+            text-align: center;
+        }
+
+        /* Stiluri pentru butoane generice */
+        .btn-primary, .btn-danger, .btn-success {
+            background: linear-gradient(to right, #ff66b2, #9900cc); /* Gradient pentru butoane */
+            color: white;
+            font-size: 1.2rem;
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            margin: 8px 0; /* Spatiu între butoane */
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+        }
+
+            .btn-primary:hover, .btn-danger:hover, .btn-success:hover {
+                transform: scale(1.05); /* Mărește butonul la hover */
+                background: linear-gradient(to right, #9900cc, #ff66b2); /* Schimbă culoarea butonului la hover */
+            }
+
+        /* Buton pentru navigare secundară */
+        .btn-secondary {
+            background: linear-gradient(to right, #ff66b2, #9900cc);
+            color: white;
+            font-size: 1.4rem;
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            text-decoration: none;
+        }
+
+            .btn-secondary:hover {
+                transform: scale(1.05); /* Mărește butonul la hover */
+                background: linear-gradient(to right, #9900cc, #ff66b2); /* Schimbă culoarea la hover */
+            }
+
+        /* Stilizare tabele pentru membri și taskuri */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+
+            .table th, .table td {
+                border: 1px solid #ddd;
+                padding: 12px 15px;
+                text-align: left;
+            }
+
+            .table th {
+                background-color: #f3e6f9;
+                font-weight: bold;
+            }
+
+        /* Selecții pentru secțiunile de taskuri și membri */
+        h2, h3 {
+            margin-top: 30px;
+            color: #660066; /* Culoare pentru titluri */
+        }
+
+        .members-section, .tasks-section {
+            background-color: #f3e6f9; /* Fundal pentru secțiuni */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Efect de umbră pentru un aspect mai elegant */
+            margin-top: 30px;
+        }
+
+        .task-actions button {
+            margin-right: 10px; /* Distanță între butoane în secțiunea de taskuri */
+        }
+
+        /* Footer */
+        .footer-text {
+            text-align: center;
+            font-size: 1rem;
+            color: white;
+            padding: 10px 20px;
+            background: none;
+            margin-top: 40px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Bara de navigație -->
+    <div class="navbar">
+        <a href="/">Unde Facem Revelionul?</a> <!-- Link pentru pagina principală -->
+        <div class="nav-buttons">
+            <a href="@Url.Action("Dashboard", "Partier")" class="btn-secondary">Back to Dashboard</a> <!-- Buton pentru întoarcere în dashboard -->
+            <form asp-action="Logout" asp-controller="Account" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-danger">Logout</button> <!-- Buton Logout -->
+            </form>
+        </div>
+    </div>
+
+    <!-- Conținutul detaliilor petrecerii -->
+    <div class="dashboard-container">
+        <h1 class="gradient-text">Party: @Model.Name</h1>
+
+        <!-- Card cu informații despre petrecere -->
+        <div class="info-card">
+            <p><strong>Party Date:</strong> @Model.Date.ToString("d")</p>
+            <p><strong>Total Budget:</strong> @Model.TotalBudget</p>
+            <p><strong>Remaining Budget:</strong> @Model.RemainingBudget</p>
+            <p><strong>Location:</strong> @Model.Location?.Name</p>
+            <p><strong>Menu:</strong> @Model.FoodMenu?.Name</p>
+            <p><strong>Party Points:</strong> @Model.TotalPoints</p>
+        </div>
+
+        <!-- Secțiunea pentru membri -->
+        <div class="members-section">
+            <h3>Members</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Points</th>
+                        <th>Remove Member</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var member in Model.PartyUsers)
+                    {
+                        <tr>
+                            <td>@member.Partier.User.Name</td>
+                            <td>@member.Partier.Points</td>
+                            <td>
+                                <form asp-action="RemoveMember" method="post" style="display:inline">
+                                    <input type="hidden" name="partyId" value="@Model.Id" />
+                                    <input type="hidden" name="partierId" value="@member.PartierId" />
+                                    <button type="submit" class="btn btn-danger">Remove</button> <!-- Buton pentru a elimina un membru -->
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Butoane pentru a adăuga membri, meniuri și locații -->
+        <a asp-action="AddMember" asp-route-partyId="@Model.Id" class="btn btn-success">Add Member</a>
+        <a asp-action="ListMenus" asp-route-partyId="@Model.Id" class="btn btn-success">Add Menu</a>
+        <a asp-action="ListLocations" asp-route-partyId="@Model.Id" class="btn btn-success">Add Location</a>
+
+        <!-- Opțiuni pentru editare și ștergere petrecere -->
+        <div class="info-card">
+            <a href="@Url.Action("EditParty", "Partier", new { id = Model.Id })" class="btn btn-primary">Edit Party</a>
+            <a href="@Url.Action("DeleteParty", "Partier", new { id = Model.Id })" class="btn btn-danger">Delete Party</a>
+        </div>
+
+        <!-- Secțiunea de taskuri -->
+        <div class="tasks-section">
+            <h2>Tasks</h2>
+            @if (ViewBag.AllTasks != null && (ViewBag.AllTasks as IEnumerable<UndeFacemRevelionul.Models.TaskModel>)?.Any() == true)
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Task</th>
+                            <th>Status</th>
+                            <th>Points</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var task in ViewBag.AllTasks)
+                        {
+                            <tr>
+                                <td>@task.Name</td>
+                                <td>
+                                    <form asp-action="ToggleTaskCompletion" method="post" style="display:inline">
+                                        <input type="hidden" name="taskId" value="@task.Id" />
+                                        <input type="hidden" name="partyId" value="@Model.Id" />
+                                        <input type="checkbox" onchange="this.form.submit()" @(task.IsCompleted ? "checked" : "") />
+                                    </form>
+                                </td>
+                                <td>@task.Points</td>
+                                <td>
+                                    @if (task.PartierId == null)
+                                    {
+                                        <form asp-action="ClaimTask" method="post" style="display:inline">
+                                            <input type="hidden" name="taskId" value="@task.Id" />
+                                            <input type="hidden" name="partyId" value="@Model.Id" />
+                                            <button type="submit" class="btn btn-success">Claim Task</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span>Claimed by: @(task.Partier?.User?.Name ?? "Unknown")</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>No available tasks.</p>
+            }
+        </div>
+
+        <!-- Buton pentru adăugarea unui task -->
+        <a asp-action="AddTask" asp-route-partyId="@Model.Id" class="btn btn-primary">Add Task</a>
+    </div>
+
+</body>
+
 
 <h2>Playlist</h2>
 
@@ -259,3 +459,4 @@ else
         margin-bottom: 10px;
     }
 </style>
+</html>
