@@ -1,6 +1,4 @@
-﻿@model UndeFacemRevelionul.ViewModels.CreatePartyViewModel
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
@@ -10,13 +8,13 @@
         /* Fundal gradient pentru pagină */
         body {
             background: linear-gradient(to right, #ff99cc, #cc66ff, #9900cc);
-            min-height: 100vh; /* Asigură că body-ul acoperă întreaga înălțime */
+            min-height: 100vh;
             display: flex;
-            justify-content: center; /* Centrează formularul pe orizontală */
-            align-items: center; /* Centrează formularul pe verticală */
+            justify-content: center;
+            align-items: center;
             font-family: Arial, sans-serif;
             flex-direction: column;
-            margin: 0; /* Elimină marginile implicite */
+            margin: 0;
         }
 
         /* Bara de navigație */
@@ -37,31 +35,18 @@
                 font-size: 1.6rem;
                 text-decoration: none;
                 font-weight: bold;
-                margin: 0 20px;
             }
 
-            .navbar .nav-buttons {
-                position: absolute;
-                right: 20px;
-                top: 50%;
-                transform: translateY(-50%);
+        .nav-buttons {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+            .nav-buttons form {
+                display: inline;
             }
-
-                .navbar .nav-buttons a {
-                    margin-left: 10px;
-                    padding: 12px 30px;
-                    background: linear-gradient(to right, #ff66b2, #9900cc);
-                    color: white;
-                    border-radius: 25px;
-                    font-size: 1.4rem;
-                    font-weight: bold;
-                    transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
-                }
-
-                    .navbar .nav-buttons a:hover {
-                        transform: scale(1.05);
-                        background: linear-gradient(to right, #9900cc, #ff66b2);
-                    }
 
         /* Formular pentru crearea petrecerii */
         .form-container {
@@ -126,24 +111,27 @@
                 background: linear-gradient(to right, #9900cc, #ff66b2);
             }
 
-        .form-container .back-button {
-            background: transparent;
-            color: #9900cc;
+        /* Buton gri pentru Back to Dashboard */
+        .back-button {
+            background: #888;
+            color: white;
             font-size: 1.4rem;
             padding: 12px;
             border-radius: 25px;
-            border: 2px solid #9900cc;
+            border: none;
             transition: all 0.3s ease-in-out;
             display: block;
             margin-top: 20px;
             text-align: center;
+            width: 100%;
+            text-decoration: none;
         }
 
-            .form-container .back-button:hover {
+            .back-button:hover {
+                background: #777;
                 transform: scale(1.05);
-                background: #9900cc;
-                color: white;
             }
+
     </style>
 </head>
 <body>
@@ -152,7 +140,6 @@
     <div class="navbar">
         <a href="/" class="navbar-title">Unde Facem Revelionul?</a>
         <div class="nav-buttons">
-            <a href="@Url.Action("Dashboard", "Partier")" class="btn-primary">Back to Dashboard</a>
             <form asp-action="Logout" asp-controller="Account" method="post" style="display:inline;">
                 <button type="submit" class="btn-primary">Logout</button>
             </form>
@@ -180,7 +167,8 @@
             <button type="submit" class="btn-primary mt-3">Create</button>
         </form>
 
-        <a href="@Url.Action("Dashboard", "Partier")" class="back-button">Back to Dashboard</a>
+        <!-- Butonul Back to Dashboard (acum gri) -->
+        <a href="@Url.Action("Dashboard", "Partier")" class="back-button">Cancel</a>
     </div>
 
 </body>
