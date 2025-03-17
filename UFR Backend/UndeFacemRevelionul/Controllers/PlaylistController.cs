@@ -108,12 +108,12 @@ namespace UndeFacemRevelionul.Controllers
         {
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
-                ApiKey = "AIzaSyCyhHqVWjKp-mOUoF05q3OjU-21KNizZJg", // Replace with your YouTube API key
+                ApiKey = "", // Replace with your YouTube API key
             });
 
             var searchListRequest = youtubeService.Search.List("snippet");
             searchListRequest.Q = searchQuery;
-            searchListRequest.MaxResults = 1; // You can adjust this to get more results if you like
+            searchListRequest.MaxResults = 1; 
 
             var searchListResponse = await searchListRequest.ExecuteAsync();
             var firstVideo = searchListResponse.Items.FirstOrDefault();
